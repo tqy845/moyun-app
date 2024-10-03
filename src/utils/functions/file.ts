@@ -83,8 +83,8 @@ export default {
   generateThumbnail(
     file: File,
     ext: string,
-    maxWidth = MoYunModeEnum.SUPER_BIG_ICON,
-    maxHeight = MoYunModeEnum.SUPER_BIG_ICON
+    maxWidth = 512,
+    maxHeight =  512
   ): Promise<string> {
     if (this.isImageType(ext)) {
       return imageUtils.imageThumbnail(file, 'webp', maxWidth, maxHeight)
