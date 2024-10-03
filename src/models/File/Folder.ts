@@ -5,7 +5,6 @@ import Dir from './Dir'
 import { singleContextmenuFactory } from './enum'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
-import { fileUtils } from '@/utils/functions'
 
 export default class Folder extends Base {
   readonly __prototype__: {

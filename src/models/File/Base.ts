@@ -1,6 +1,8 @@
 import { FileRawModel } from '@/api/models/fileModel'
 import { useDownloadStore } from '@/stores'
-import { FlagEnum } from '@/constants'
+import { FileExtensionEnum, FlagEnum } from '@/constants'
+import { putRenameFolderName } from '@/api/dir'
+import { putRenameFileName } from '@/api/file'
 
 export default class Base {
   public parentId!: number
@@ -25,17 +27,19 @@ export default class Base {
   // 进度条
   public progress = ref(0)
 
+
   /**
    * 构造方法
    */
   constructor(file: FileRawModel) {
     // 将合法属性赋给File
     Object.keys(file).forEach((key) => {
-      if (Object.prototype.hasOwnProperty.call(this, key)) {
+      if (Object.hasOwn(this, key)) {
         // @ts-ignore
         this[key] = file[key]
       }
     })
+    this.name = file.name
   }
 
   /**
@@ -43,18 +47,20 @@ export default class Base {
    * @param flag FlagEnum
    */
   hasFlag = (flag: FlagEnum) => {
-    return this.flag.split('').includes(flag)
+    return this.flag.toString().split('').includes(flag)
   }
 
   /**
    * 查看此文件/文件夹详情
    */
-  detail = async () => {}
+  detail = async () => {
+  }
 
   /**
    * 分享此文件/文件夹
    */
-  shear = async () => {}
+  shear = async () => {
+  }
 
   /**
    * 复制此文件/文件夹
@@ -67,16 +73,24 @@ export default class Base {
    * 重命名此文件/文件夹
    */
   rename = async (newName: string) => {
-    this.isRenaming.value = false
-    if (this.name === newName) return
-
-    console.log('重命名', newName)
+    try {
+      if (this.name === newName) new Error('无改动')
+      const { fail } = await (Object.is(this.extension, FileExtensionEnum.FOLDER) ?
+        putRenameFolderName(this.id, { name: newName }) : putRenameFileName(this.id, { name: newName }))
+      if (!fail) {
+        this.name = newName
+      }
+    } finally {
+      await nextTick()
+      this.isRenaming.value = false
+    }
   }
 
   /**
    * 同步此文件/文件夹
    */
-  sync = async () => {}
+  sync = async () => {
+  }
 
   /**
    * 删除此文件/文件夹

@@ -1,12 +1,13 @@
 import { request } from '@/utils/request'
 import { FileRawModel } from '@/api/models/fileModel'
 import { QueryDirectoryModel, AsideMenuModel } from '@/api/models/dirModel'
+import { FetchResponse } from '@/utils/request/utils.ts'
 
 const Api = {
   NewFolder: (parentId: number) => `/dir/${parentId}`,
   AsideMenu: `/dir/menu/aside/list`,
   QuickById: (id: number) => `/dir/${id}/quick`,
-  Update: `/dir`,
+  RenameFolderName: (folderId: number) => `/dir/${folderId}/name`,
   Remove: (id: number) => `/dir/${id}`,
   GetById: (id: number) => `/dir/${id}`,
   GetFileList: (id: number) => `/dir/${id}`,
@@ -54,11 +55,15 @@ export function postNewFolder(parentId: number) {
   return request.post<{ file: FileRawModel }>(Api.NewFolder(parentId))
 }
 
-export function putUpdate<T>(body: File) {
-  return request.put<T>(Api.Update, {
+export function putRenameFolderName(folderId: number, body: { name: string }) {
+  return request.put<FetchResponse<any>>(Api.RenameFolderName(folderId), {
     body
+  }, {
+    isTransformResponse:false
   })
 }
+
+
 
 export function deleteRemove<T>(id: number) {
   return request.delete<T>(Api.Remove(id), {})

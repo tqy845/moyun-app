@@ -4,7 +4,6 @@ import { singleContextmenuFactory } from './enum'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
 import { fileUtils } from '@/utils/functions'
-import TauriWindow from '@/tauri-window'
 import { usePreviewStore } from '@/stores'
 
 /**
