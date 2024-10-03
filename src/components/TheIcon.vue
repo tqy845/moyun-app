@@ -1,0 +1,72 @@
+<script lang="ts" setup>
+import { baseUtils } from '@/utils/functions'
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
+  },
+  filename: {
+    type: String,
+    default: ''
+  },
+  external: {
+    type: Boolean,
+    default: false
+  },
+  width: {
+    type: Number,
+    default: 0
+  }
+})
+
+const iconRef = shallowRef()
+
+const executed = () => {
+  if (!props.external) {
+    import('tdesign-icons-vue-next').then((icons) => {
+      const _name = `${baseUtils.toPascalCase(props.name)}Icon`
+      if (props.name && icons[_name]) {
+        iconRef.value = icons[_name]
+      }
+    })
+  }
+}
+
+onMounted(executed)
+onUpdated(executed)
+</script>
+
+<template>
+  <!-- 如果有 filename，则显示缩略图 -->
+  <t-image
+    v-if="filename"
+    :lazy="true"
+    :srcset="{
+      'image/webp': `http://server001:9000/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`
+    }"
+    :style="{ height: `${width}px` }"
+    class="!bg-transparent !filter-drop-shadow inline-block"
+    fit="contain"
+  />
+  <!-- 内部图标 -->
+  <component :is="iconRef" v-else-if="!external" v-bind="$attrs"></component>
+  <!-- 外部图标-->
+  <t-icon
+    v-else
+    :loadDefaultIcons="false"
+    :name="`icon-${name}`"
+    url="src/assets/icons/iconfont"
+    v-bind="$attrs"
+  />
+</template>
+
+<style lang="scss" scoped>
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+</style>

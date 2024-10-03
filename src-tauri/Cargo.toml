@@ -1,0 +1,39 @@
+[package]
+name = "app"
+version = "0.1.0"
+description = "moyun app"
+authors = ["you"]
+license = ""
+repository = ""
+edition = "2021"
+rust-version = "1.70"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "tauri_v2_001_lib"
+crate-type = ["staticlib", "cdylib", "lib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "2.0.0", features = [] }
+tauri-plugin-http = "2.0.0"
+base64 = "0.22.1"
+winapi = "0.3.9"
+image = "0.25.2"
+sha2 = "0.10.8"
+tauri-plugin-fs = "2.0.0"
+tauri-plugin-dialog = "2.0.0"
+file-hashing = "0.1.2"
+sha1 = "0.10.6"
+fs = "0.0.5"
+tauri-plugin-upload = "2.0.0"
+reqwest = "0.12.7"
+futures-util = "0.3.30"
+
+#[source.crates-io]
+#registry = "https://github.com/rust-lang/crates.io-index"

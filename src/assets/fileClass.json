@@ -1,0 +1,75 @@
+{
+  "video": [
+    "mp4",
+    "mkv",
+    "avi",
+    "mov",
+    "flv",
+    "wmv",
+    "webm",
+    "m4v"
+  ],
+  "audio": [
+    "mp3",
+    "wav",
+    "flac",
+    "aac",
+    "ogg",
+    "wma",
+    "m4a"
+  ],
+  "document": [
+    "doc",
+    "docx",
+    "pdf",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "txt",
+    "odt",
+    "ods",
+    "odp",
+    "rtf"
+  ],
+  "image": [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "bmp",
+    "tiff",
+    "svg",
+    "webp",
+    "ico"
+  ],
+  "archive": [
+    "zip",
+    "rar",
+    "7z",
+    "tar",
+    "gz",
+    "bz2",
+    "xz",
+    "iso"
+  ],
+  "code": [
+    "html",
+    "css",
+    "js",
+    "ts",
+    "json",
+    "xml",
+    "yml",
+    "yaml",
+    "md",
+    "java",
+    "py",
+    "go",
+    "rb",
+    "php",
+    "cpp",
+    "c",
+    "rs"
+  ]
+}

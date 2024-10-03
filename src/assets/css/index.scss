@@ -1,0 +1,55 @@
+@font-face {
+  font-family: 'AlimamaFangYuanTiVF-Thin';
+  src: url('@/assets/fonts/AlimamaFangYuanTiVF-Thin.woff2') format('opentype');
+  font-weight: 500;
+  font-display: swap; /* 使用浏览器默认字体，直到字体加载完成 */
+}
+
+@font-face {
+  font-family: 'AlibabaPuHuiTi';
+  src: url('@/assets/fonts/AlibabaPuHuiTi-3-55-RegularL3.woff2') format('opentype');
+  font-weight: 500;
+  font-display: swap; /* 使用浏览器默认字体，直到字体加载完成 */
+}
+
+* {
+  font-family: 'AlimamaFangYuanTiVF-Thin', sans-serif;
+  box-sizing: border-box;
+}
+html,
+body,
+#app {
+  height: 100% !important;
+  width: 100% !important;
+  -webkit-user-drag: none !important; /* Safari/Chrome */
+  -moz-user-select: none !important; /* Firefox */
+  -ms-user-select: none !important; /* Internet Explorer/Edge */
+  user-select: none !important;
+  overflow: hidden !important;
+}
+
+/* 滚动条的轨道 */
+::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+/* 滚动条轨道上的轨道 */
+::-webkit-scrollbar-track {
+  background: #f1f1f1 !important; /* 轨道的背景色 */
+}
+
+/* 滚动条的滑块 */
+::-webkit-scrollbar-thumb {
+  background: #999 !important; /* 滑块的颜色 */
+  border-radius: 4px !important; /* 滑块的圆角 */
+}
+
+/* 滚动条的滑块悬停状态 */
+::-webkit-scrollbar-thumb:hover {
+  background: #555 !important;
+}
+
+/* 滚动条的角落 */
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}

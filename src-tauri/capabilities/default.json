@@ -1,0 +1,67 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "enables the default permissions",
+  "windows": ["main"],
+  "platforms": ["linux", "macOS", "windows"],
+  "permissions": [
+    "core:event:default",
+    "core:window:default",
+    "core:window:allow-start-dragging",
+    "core:app:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default",
+    "core:webview:allow-internal-toggle-devtools",
+    "core:webview:default",
+    "core:window:allow-minimize",
+    "core:window:allow-close",
+    "core:window:allow-maximize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-unmaximize",
+    "core:window:allow-unminimize",
+    "fs:default",
+    "fs:write-all",
+    "core:path:default",
+    "dialog:default",
+    "core:window:allow-create",
+    "core:webview:allow-create-webview",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        {
+          "path": "*"
+        }
+      ]
+    },
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "http://s1.tqy.pub:9010/api/v1/*"
+        },
+        {
+          "url": "http://localhost:9010/api/v1/*"
+        },
+        {
+          "url": "http://server001:9010/api/v1/*"
+        },
+        {
+          "url": "http://172.22.27.104:9000/*"
+        },
+        {
+          "url": "http://server001:9000/*"
+        },
+        {
+          "url": "http://127.0.0.1:4523/m1/3943478-3578881-default/*"
+        }
+      ],
+      "deny": [
+        {
+          "url": "https://private.tauri.app"
+        }
+      ]
+    },
+    "upload:default"
+  ]
+}
