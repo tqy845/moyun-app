@@ -1,8 +1,8 @@
 import { FileRawModel } from '@/api/models/fileModel'
-import { useDownloadStore } from '@/stores'
+import { useDownloadStore, usePathStore } from '@/stores'
 import { FileExtensionEnum, FlagEnum } from '@/constants'
-import { putRenameFolderName } from '@/api/dir'
-import { putRenameFileName } from '@/api/file'
+import { putRemoveFolder, putRenameFolderName } from '@/api/dir'
+import { putRemoveFile, putRenameFileName } from '@/api/file'
 
 export default class Base {
   public parentId!: number
@@ -27,7 +27,6 @@ export default class Base {
   // 进度条
   public progress = ref(0)
 
-
   /**
    * 构造方法
    */
@@ -42,6 +41,10 @@ export default class Base {
     this.name = file.name
   }
 
+  get isFolder() {
+    return Object.is(this.extension, FileExtensionEnum.FOLDER)
+  }
+
   /**
    * 判断是否拥有flag
    * @param flag FlagEnum
@@ -53,14 +56,12 @@ export default class Base {
   /**
    * 查看此文件/文件夹详情
    */
-  detail = async () => {
-  }
+  detail = async () => {}
 
   /**
    * 分享此文件/文件夹
    */
-  shear = async () => {
-  }
+  shear = async () => {}
 
   /**
    * 复制此文件/文件夹
@@ -75,8 +76,9 @@ export default class Base {
   rename = async (newName: string) => {
     try {
       if (this.name === newName) new Error('无改动')
-      const { fail } = await (Object.is(this.extension, FileExtensionEnum.FOLDER) ?
-        putRenameFolderName(this.id, { name: newName }) : putRenameFileName(this.id, { name: newName }))
+      const { fail } = await (this.isFolder
+        ? putRenameFolderName(this.id, { name: newName })
+        : putRenameFileName(this.id, { name: newName }))
       if (!fail) {
         this.name = newName
       }
@@ -89,20 +91,24 @@ export default class Base {
   /**
    * 同步此文件/文件夹
    */
-  sync = async () => {
-  }
+  sync = async () => {}
 
   /**
    * 删除此文件/文件夹
    */
   delete = async () => {
-    // if (this.type === FlagEnum.QUICK) {
-    //   // 从快速访问从删除
-    //   this.fileService.quick(this)
-    // }
-    // if (await this.fileService.delete(this)) {
-    //   useFileStore().deleted(this)
-    // }
+    console.log(1)
+    try {
+      const { fail } = await (this.isFolder ? putRemoveFolder(this.id) : putRemoveFile(this.id))
+      if (!fail) {
+        // 从目录中删除
+        const { removeCurrentDirFile } = usePathStore()
+        removeCurrentDirFile(this)
+        // 从快速访问中删除
+      }
+    } finally {
+      console.log(1)
+    }
     console.log('删除')
   }
 
