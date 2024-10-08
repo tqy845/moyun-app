@@ -149,7 +149,7 @@ const eventUpdateSelected = (
           <!-- 标题加上图标 -->
           <div class="overflow-hidden text-ellipsis">
             <TheIcon  class="mr-1 mb-1" shape="round" :external="true"
-                     :filename="fileUtils.isThumbnailType(row['extension']) ?  row['notExtName'] : '' "
+                     :filename="fileUtils.isThumbnailType(row['extension']) ?  row['hash'] : '' "
                      :name="row['icon']" size="30" :width="30" />
             <span class="">{{ row[col.colKey] }}</span>
           </div>
@@ -167,7 +167,7 @@ const eventUpdateSelected = (
   <TheEmpty
     v-else
     :empty="currentDirFiles.length === 0"
-    :loading="fileStore.reading || isLoading"
+    :loading="isLoading"
   />
 </template>
 

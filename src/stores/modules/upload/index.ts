@@ -16,9 +16,11 @@ export const useUploadStore = defineStore(`upload-store`, () => {
   const _uploadThumbnail = (
     file: File,
     {
+      hash,
       thumbnailUrl,
       formData
     }: {
+      hash: string
       thumbnailUrl: string
       formData: Record<string, string>
     }
@@ -28,7 +30,6 @@ export const useUploadStore = defineStore(`upload-store`, () => {
       try {
         // 生成缩略图
         const ext = fileUtils.getExtName(file.name)
-        const notExt = fileUtils.getNotExtName(file.name)
         const thumbnail = await fileUtils.generateThumbnail(file, ext)
         const blob = await fileUtils.dataURLtoBlob(thumbnail)
 
@@ -38,8 +39,8 @@ export const useUploadStore = defineStore(`upload-store`, () => {
             _formData.append(key, formData[key])
           }
         }
-        _formData.append('file', blob, `${notExt}.webp`)
-
+        _formData.append('file', blob, `${hash}.webp`)
+        console.log("hash = ",hash)
         // 上传缩略图
         await uploadThumbnail(_formData, thumbnailUrl)
         resolve(true)
@@ -216,6 +217,7 @@ export const useUploadStore = defineStore(`upload-store`, () => {
         // 上传缩略图
         if (thumbnailUrl) {
           await _uploadThumbnail(file, {
+            hash: sha256,
             thumbnailUrl,
             formData: formData!
           })

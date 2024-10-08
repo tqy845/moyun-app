@@ -111,7 +111,7 @@ onUpdated(updated)
         <t-col class="flex justify-center w-100">
           <TheIcon
             :external="true"
-            :filename="fileUtils.isThumbnailType(file.extension) ? file.notExtName : ''"
+            :filename="fileUtils.isThumbnailType(file.extension) ? file.hash : ''"
             :name="file.icon"
             :size="`${fileSize}px`"
             :width="fileSize"
