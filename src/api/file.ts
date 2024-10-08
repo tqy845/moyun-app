@@ -26,7 +26,7 @@ const Api = {
   GetChunkDownload: `/file/chunk/download`,
   PostPreviewUrl: `/file/preview`,
   RenameFileName: (fileId: number) => `/file/${fileId}/file/name`,
-  RemoveFile: (fileId: number) => `/file/${fileId}/file`,
+  RemoveFile: (fileId: number) => `/file/${fileId}/file`
 }
 
 export const getById = <T>(id: number) => {
@@ -185,5 +185,7 @@ export function putRenameFileName(fileId: number, body: { name: string }) {
 }
 
 export function putRemoveFile(fileId: number) {
-  return request.put<FetchResponse<any>>(Api.RemoveFile(fileId))
+  return request.put<FetchResponse<any>>(Api.RemoveFile(fileId), {}, {
+    isTransformResponse: false
+  })
 }

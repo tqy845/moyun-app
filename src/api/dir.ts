@@ -69,5 +69,7 @@ export function putRenameFolderName(folderId: number, body: { name: string }) {
 }
 
 export function putRemoveFolder(folderId: number) {
-  return request.put<FetchResponse<any>>(Api.RemoveFolder(folderId))
+  return request.put<FetchResponse<any>>(Api.RemoveFolder(folderId), {}, {
+    isTransformResponse: false
+  })
 }

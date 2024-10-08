@@ -31,20 +31,15 @@ export const usePathStore = defineStore(
     const addSelected = (...file: Array<File | Folder>) => {
       currentDirSelectedFiles.value.push(...file)
     }
-    const removeCurrentDirFile = (file: Base) => {
-      removeSelected(file)
-      const index = currentDirFiles.value.findIndex(
-        (_file) => _file.id === file.id && _file.__prototype__ === file.__prototype__
-      )
+    const removeCurrentDirFile = (fileRaw: Base) => {
+      removeSelected(fileRaw)
+      const index = currentDirFiles.value.findIndex((_file) => _file.hash === fileRaw.hash)
       if (index !== -1) {
         currentDirFiles.value.splice(index, 1)
       }
     }
-    const removeSelected = (file: File | Folder) => {
-      const index = currentDirSelectedFiles.value.findIndex(
-        (_file: File | Folder) =>
-          !(_file.id === file.id && _file.__prototype__ === file.__prototype__)
-      )
+    const removeSelected = (fileRaw: Base) => {
+      const index = currentDirSelectedFiles.value.findIndex((_file: File | Folder) => !(fileRaw.hash === _file.hash))
       if (index !== -1) {
         currentDirSelectedFiles.value.splice(index, 1)
       }

@@ -1,4 +1,4 @@
-import { FileExtensionEnum, MoYunModeEnum, SortModeEnum, SortTypeEnum } from '@/constants'
+import { FileExtensionEnum, SortModeEnum, SortTypeEnum } from '@/constants'
 import Folder from '@/models/File/Folder'
 import MYFile from '@/models/File/File'
 import { Prototype } from '@/models/File/interface'

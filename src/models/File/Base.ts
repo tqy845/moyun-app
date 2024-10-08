@@ -97,7 +97,6 @@ export default class Base {
    * 删除此文件/文件夹
    */
   delete = async () => {
-    console.log(1)
     try {
       const { fail } = await (this.isFolder ? putRemoveFolder(this.id) : putRemoveFile(this.id))
       if (!fail) {
