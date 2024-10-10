@@ -67,6 +67,8 @@ export default class Base {
    * 复制此文件/文件夹
    */
   copy = async () => {
+    console.log(1);
+    
     this.isCopying.value = false
   }
 
