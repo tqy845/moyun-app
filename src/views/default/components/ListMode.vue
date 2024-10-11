@@ -148,7 +148,7 @@ const eventUpdateSelected = (
         <template #name="{ col, row }">
           <!-- 标题加上图标 -->
           <div class="overflow-hidden text-ellipsis">
-            <TheIcon  class="mr-1 mb-1" shape="round" :external="true"
+            <TheIcon  class="mr-2 mb-1 w-[50px]" shape="round" :external="true"
                      :filename="fileUtils.isThumbnailType(row['extension']) ?  row['hash'] : '' "
                      :name="row['icon']" size="30" :width="30" />
             <span class="">{{ row[col.colKey] }}</span>

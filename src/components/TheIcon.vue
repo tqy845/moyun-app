@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { baseUtils } from '@/utils/functions'
+import {useUserStore} from "@/stores"
+
+const {endpoint} = useUserStore()
 
 const props = defineProps({
   name: {
@@ -24,7 +27,7 @@ const iconRef = shallowRef()
 
 const executed = () => {
   if (!props.external) {
-    import('tdesign-icons-vue-next').then((icons) => {
+    import('tdesign-icons-vue-next').then((icons:any) => {
       const _name = `${baseUtils.toPascalCase(props.name)}Icon`
       if (props.name && icons[_name]) {
         iconRef.value = icons[_name]
@@ -43,7 +46,7 @@ onUpdated(executed)
     v-if="filename"
     :lazy="true"
     :srcset="{
-      'image/webp': `http://server001:9000/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`
+      'image/webp': `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`
     }"
     :style="{ height: `${width}px` }"
     class="!bg-transparent !filter-drop-shadow inline-block"
