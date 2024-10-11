@@ -156,8 +156,8 @@ export class ContextMenu {
             prefixIcon: `pin`,
             icon: "pin",
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.quick(true))
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.quick(true))
             }
         })
         return this
@@ -170,8 +170,8 @@ export class ContextMenu {
             name: '从“快捷访问”取消固定',
             icon: 'pin',
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.quick(false))
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.quick(false))
             }
         })
         return this
@@ -241,8 +241,8 @@ export class ContextMenu {
             icon: 'gesture-up-1',
             shortcutKey: `Enter`,
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.open())
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.open())
             }
         })
         return this
@@ -255,8 +255,8 @@ export class ContextMenu {
             icon: 'tools',
             shortcutKey: `Alt+Enter`,
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.detail())
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.detail())
             }
         })
         return this
@@ -269,8 +269,8 @@ export class ContextMenu {
             icon: 'cloud-download',
             color: 'primary',
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.download())
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.download())
             }
         })
         return this
@@ -284,8 +284,8 @@ export class ContextMenu {
             shortcutKey: `Ctrl+X`,
             color: 'primary',
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.isShearing.value = true)
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.isShearing.value = true)
             }
         })
         return this
@@ -299,8 +299,8 @@ export class ContextMenu {
             shortcutKey: `Ctrl+C`,
             color: 'primary',
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.isCopying = true)
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.isCopying = true)
             }
         })
         return this
@@ -315,8 +315,8 @@ export class ContextMenu {
             shortcutKey: `F2`,
             color: 'primary',
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.isRenaming.value = true)
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.isRenaming.value = true)
             }
         })
         return this
@@ -330,8 +330,8 @@ export class ContextMenu {
             shortcutKey: `Delete`,
             color: 'danger',
             action: () => {
-                const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.delete())
+                const { currentDirSelectedFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.delete())
             }
         })
         return this
