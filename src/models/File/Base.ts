@@ -20,7 +20,6 @@ export default class Base {
   public deleteAt?: string
 
   public isDownloading = ref(false)
-
   public isShearing = ref(false)
   public isCopying = ref(false)
   public isRenaming = ref(false)

@@ -300,7 +300,7 @@ export class ContextMenu {
             color: 'primary',
             action: () => {
                 const { currentDirFiles } = usePathStore()
-                currentDirFiles.forEach(file => file.isCopying.value = true)
+                currentDirFiles.forEach(file => file.isCopying = true)
             }
         })
         return this

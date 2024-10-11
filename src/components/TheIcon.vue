@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { baseUtils } from '@/utils/functions'
-import {useUserStore} from "@/stores"
+import { useUserStore } from "@/stores"
 
-const {endpoint} = useUserStore()
+const { endpoint } = useUserStore()
 
 const props = defineProps({
   name: {
@@ -27,7 +27,7 @@ const iconRef = shallowRef()
 
 const executed = () => {
   if (!props.external) {
-    import('tdesign-icons-vue-next').then((icons:any) => {
+    import('tdesign-icons-vue-next').then((icons: any) => {
       const _name = `${baseUtils.toPascalCase(props.name)}Icon`
       if (props.name && icons[_name]) {
         iconRef.value = icons[_name]
@@ -42,26 +42,14 @@ onUpdated(executed)
 
 <template>
   <!-- 如果有 filename，则显示缩略图 -->
-  <t-image
-    v-if="filename"
-    :lazy="true"
-    :srcset="{
-      'image/webp': `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`
-    }"
-    :style="{ height: `${width}px` }"
-    class="!bg-transparent !filter-drop-shadow inline-block"
-    fit="contain"
-  />
+  <img v-if="filename" loading="lazy"
+    :src="`http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`"
+    :style="{ height: `${width}px` }" class="!bg-transparent !filter-drop-shadow inline-block object-contain" draggable="false" />
   <!-- 内部图标 -->
-  <component :is="iconRef" v-else-if="!external" v-bind="$attrs"></component>
+  <component :is="iconRef" v-else-if="!external" v-bind="$attrs" draggable="false"></component>
   <!-- 外部图标-->
-  <t-icon
-    v-else
-    :loadDefaultIcons="false"
-    :name="`icon-${name}`"
-    url="src/assets/icons/iconfont"
-    v-bind="$attrs"
-  />
+  <t-icon v-else :loadDefaultIcons="false" :name="`icon-${name}`" url="src/assets/icons/iconfont" v-bind="$attrs"
+    draggable="false" />
 </template>
 
 <style lang="scss" scoped>

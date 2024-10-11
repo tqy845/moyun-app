@@ -82,51 +82,31 @@ onUpdated(updated)
 </script>
 
 <template>
-  <t-card
-    v-mouse-disabled-context-menu
-    :bordered="false"
-    :class="[selectedStyles]"
+  <t-card v-mouse-disabled-context-menu :bordered="false" :class="[selectedStyles]"
     :style="{ '--file-container-width': `${fileSize}px` }"
-    class="card m-1 cursor-pointer flex justify-center text-center bg-transparent"
-    @click="eventSelected"
-    @contextmenu="eventContextmenu"
-  >
+    class="card m-1 cursor-pointer flex justify-center text-center bg-transparent" @click="eventSelected"
+    @contextmenu="eventContextmenu">
     <t-popup :delay="[1300, 0]" placement="bottom-left" showArrow>
       <!-- 扩展提示 -->
       <template #content>
         <div class="w-40">
           <t-row><span class="text-small">名称：</span>{{ file.name }}</t-row>
-          <t-row
-            ><span class="text-small font-bold">大小：</span
-            >{{ fileUtils.formatFileSize(file.size || 0) }}
+          <t-row><span class="text-small font-bold">大小：</span>{{ fileUtils.formatFileSize(file.size || 0) }}
           </t-row>
-          <t-row
-            ><span class="text-small font-bold">修改日期：</span
-            >{{ useDateFormat(file.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
+          <t-row><span class="text-small font-bold">修改日期：</span>{{ useDateFormat(file.updatedAt, 'YYYY-MM-DD HH:mm:ss')
+            }}
           </t-row>
         </div>
       </template>
       <!-- 基本信息 -->
       <t-row :class="[copyStyles]" align="center" class="flex-col file-container">
         <t-col class="flex justify-center w-100">
-          <TheIcon
-            :external="true"
-            :filename="fileUtils.isThumbnailType(file.extension) ? file.hash : ''"
-            :name="file.icon"
-            :size="`${fileSize}px`"
-            :width="fileSize"
-            class="pt-1"
-          />
+          <TheIcon :external="true" :filename="fileUtils.isThumbnailType(file.extension) ? file.hash : ''"
+            :name="file.icon" :size="`${fileSize}px`" :width="fileSize" class="pt-1" />
 
-          <t-progress
-            v-if="file.isDownloading"
-            :percentage="parseFloat(file.progress.toFixed(2))"
-            :size="fileSize"
-            :strokeWidth="fileSize / 9"
-            class="position-absolute"
-            style="top: 0"
-            theme="circle"
-          />
+          <t-progress v-if="file.isDownloading"
+            :percentage="parseFloat((file.progress as unknown as number).toFixed(2))" :size="fileSize"
+            :strokeWidth="fileSize / 9" class="position-absolute" style="top: 0" theme="circle" />
         </t-col>
         <t-col v-if="showName" class="my-1 w-full">
           <div class="multi-line-text overflow-hidden text-size-xs line-height-[1.5] text-center">
@@ -134,18 +114,10 @@ onUpdated(updated)
               {{ file.notExtName }}
             </div>
             <!-- 重命名 -->
-            <t-textarea
-              v-else
-              ref="textareaRef"
-              v-model="form.value"
-              v-element-select-textarea-content="{
-                begin: 0,
-                end: file.name.includes('.') ? file.name.lastIndexOf('.') : 0 // 默认选中文件名不带后缀
-              }"
-              v-on-click-outside="() => file.rename(form.value)"
-              :default-value="file.name"
-              autosize
-            />
+            <t-textarea v-else ref="textareaRef" v-model="form.value" v-element-select-textarea-content="{
+              begin: 0,
+              end: file.name.includes('.') ? file.name.lastIndexOf('.') : 0 // 默认选中文件名不带后缀
+            }" v-on-click-outside="() => file.rename(form.value)" :default-value="file.name" autosize />
           </div>
         </t-col>
       </t-row>
@@ -155,7 +127,8 @@ onUpdated(updated)
 
 <style lang="scss" scoped>
 .file-container {
-  width: var(--file-container-width); /* 使用 CSS 变量设置宽度 */
+  width: var(--file-container-width);
+  /* 使用 CSS 变量设置宽度 */
 }
 
 .card {

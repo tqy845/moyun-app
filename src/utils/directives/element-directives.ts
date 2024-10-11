@@ -6,6 +6,7 @@
  */
 import { App, DirectiveBinding } from 'vue'
 
+
 export const sizeObserver = {
   mounted(el: HTMLElement & { _resizeObserver_: ResizeObserver }, binding: DirectiveBinding) {
     const callback = binding.value as Function
@@ -88,7 +89,7 @@ export const selectInputContent = {
 const elementDirectives: Record<string, Object> = {
   sizeObserver,
   selectTextareaContent,
-  selectInputContent
+  selectInputContent,
 }
 
 /**

@@ -4,7 +4,7 @@ import File from '@/models/File/File'
 import Folder from '@/models/File/Folder'
 import { useUserStore } from '@/stores';
 
-const {endpoint} = useUserStore()
+const { endpoint } = useUserStore()
 
 defineProps({
   dirFiles: Array as PropType<File[] | Folder[]>, // 接受 File 和 Folder 数组
@@ -38,16 +38,22 @@ const layoutMasonry = () => {
   grid.style.height = `${Math.max(...columnHeights)}px`
 }
 
-// 处理图片加载完成事件
-const handleImageLoad = (event: Event) => {
-  const target = event.target as HTMLImageElement
-  target.dataset.loaded = 'true'
+
+const handleSuccess = (src: string) => {
+  const el = document.querySelector(`[src="${src}"]`)
+  el?.setAttribute("draggable", "false")
 }
+
 
 // 监测所有图片加载完成的函数
 const monitorImagesLoaded = () => {
   return new Promise<void>((resolve) => {
-    const images = Array.from(masonryGrid.value.children).map((item: HTMLElement) => {
+    if (!masonryGrid.value?.children.length) {
+      resolve()
+      return
+    }
+
+    const images = Array.from(masonryGrid.value.children).map((item) => {
       return item.querySelector('img') // 获取每个项中的图片
     })
 
@@ -89,18 +95,14 @@ onUnmounted(() => {
   <div ref="masonryGrid" class="!w-auto !relative">
     <div v-for="(file, index) in dirFiles" :key="index" class="masonry-item">
       <TheContextMenu :menu="selectedFile?.menuItems" @select="$event.action(selectedFile)">
-        <t-image
-          :alt="file.name"
-          :lazy="true"
-          :srcset="{
-            'image/webp': `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(file.hash)}.webp`
-          }"
-          class="mb-3 !bg-transparent w-[100px]"
-          fit="scale-down"
-          @contextmenu="selectedFile = file"
-          @loadeddata="handleImageLoad"
+        <t-image :alt="file.name" :lazy="true"
+          :src="`http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(file.hash)}.webp`" :srcset="{
+            'image/webp': `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(file.hash)}.webp`,
+            'image/avif': ``
+          }" class="mb-3 !bg-transparent w-[100px]" fit="scale-down" @contextmenu="selectedFile = file"
           @dblclick.stop="file.open()"
-        />
+          @load="handleSuccess(`http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(file.hash)}.webp`)"
+          ref="imageRefs" />
       </TheContextMenu>
     </div>
   </div>
