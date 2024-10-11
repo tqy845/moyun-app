@@ -24,7 +24,9 @@ const Api = {
   GetFileChunks: (filename: string, parentId: number) => `/file/chunk/${parentId}/${filename}/list`,
   BuildDownloadTask: `/file/download/build`,
   GetChunkDownload: `/file/chunk/download`,
-  PostPreviewUrl: `/file/preview`
+  PostPreviewUrl: `/file/preview`,
+  RenameFileName: (fileId: number) => `/file/${fileId}/file/name`,
+  RemoveFile: (fileId: number) => `/file/${fileId}/file`
 }
 
 export const getById = <T>(id: number) => {
@@ -172,4 +174,18 @@ export const uploadFileChunk = (formData: FormData, url: string) => {
       apiUrl: ''
     }
   )
+}
+
+export function putRenameFileName(fileId: number, body: { name: string }) {
+  return request.put<FetchResponse<any>>(Api.RenameFileName(fileId), {
+    body
+  }, {
+    isTransformResponse: false
+  })
+}
+
+export function putRemoveFile(fileId: number) {
+  return request.put<FetchResponse<any>>(Api.RemoveFile(fileId), {}, {
+    isTransformResponse: false
+  })
 }

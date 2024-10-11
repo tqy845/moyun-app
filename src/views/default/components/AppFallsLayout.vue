@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, useTemplateRef } from 'vue'
-import File from '@/models/File/File.ts'
-import Folder from '@/models/File/Folder.ts'
+import File from '@/models/File/File'
+import Folder from '@/models/File/Folder'
+import { useUserStore } from '@/stores';
+
+const {endpoint} = useUserStore()
 
 defineProps({
   dirFiles: Array as PropType<File[] | Folder[]>, // 接受 File 和 Folder 数组
@@ -88,8 +91,11 @@ onUnmounted(() => {
       <TheContextMenu :menu="selectedFile?.menuItems" @select="$event.action(selectedFile)">
         <t-image
           :alt="file.name"
-          :src="`http://server001:9000/moyun-bucket-1/thumbnail/${encodeURIComponent(file.notExtName)}.webp`"
-          class="mb-3 !bg-transparent"
+          :lazy="true"
+          :srcset="{
+            'image/webp': `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(file.hash)}.webp`
+          }"
+          class="mb-3 !bg-transparent w-[100px]"
           fit="scale-down"
           @contextmenu="selectedFile = file"
           @loadeddata="handleImageLoad"

@@ -1,4 +1,4 @@
-import { UserLoginModel, UserRegisterModel } from '@/api/models/userModel'
+import { UserLoginModel, UserLoginResModel, UserRegisterModel } from '@/api/models/userModel'
 import { request } from '@/utils/request'
 import { UserModel } from './models/userModel.ts'
 
@@ -22,8 +22,8 @@ export function postUserRegister(body: UserRegisterModel) {
   )
 }
 
-export function postUserLogin<T>(body: UserLoginModel) {
-  return request.post<T>(
+export function postUserLogin(body: UserLoginModel) {
+  return request.post<UserLoginResModel>(
     Api.Login,
     {
       body

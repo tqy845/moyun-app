@@ -17,6 +17,12 @@ export interface UserLoginModel {
   remember?: boolean
 }
 
+export interface UserLoginResModel {
+  token: string
+  user: UserModel
+  endpoint:string
+}
+
 export interface UserRegisterModel extends UserLoginModel {
   rePassword: string
   agreement: boolean

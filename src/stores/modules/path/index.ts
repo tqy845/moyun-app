@@ -4,6 +4,7 @@ import Folder from '@/models/File/Folder'
 import File from '@/models/File/File'
 import { fileUtils } from '@/utils/functions'
 import { useDirStore, useFileMapStore, useSettingStore } from '@/stores'
+import Base from '@/models/File/Base.ts'
 
 export type AggregateFile = (File & any) | (Folder & any)
 
@@ -30,12 +31,18 @@ export const usePathStore = defineStore(
     const addSelected = (...file: Array<File | Folder>) => {
       currentDirSelectedFiles.value.push(...file)
     }
-    const removeSelected = (file: File | Folder) => {
-      const index = currentDirSelectedFiles.value.findIndex(
-        (_file: File | Folder) =>
-          !(_file.id === file.id && _file.__prototype__ === file.__prototype__)
-      )
-      currentDirSelectedFiles.value.splice(index, 1)
+    const removeCurrentDirFile = (fileRaw: Base) => {
+      removeSelected(fileRaw)
+      const index = currentDirFiles.value.findIndex((_file) => _file.hash === fileRaw.hash)
+      if (index !== -1) {
+        currentDirFiles.value.splice(index, 1)
+      }
+    }
+    const removeSelected = (fileRaw: Base) => {
+      const index = currentDirSelectedFiles.value.findIndex((_file: File | Folder) => !(fileRaw.hash === _file.hash))
+      if (index !== -1) {
+        currentDirSelectedFiles.value.splice(index, 1)
+      }
     }
     const allSelected = () => {
       clearSelected()
@@ -109,6 +116,7 @@ export const usePathStore = defineStore(
       clearSelected,
       addSelected,
       removeSelected,
+      removeCurrentDirFile,
       allSelected,
       reverseSelected,
       back,
