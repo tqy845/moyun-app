@@ -1,6 +1,7 @@
 import { ContentMenuItem, ContentMenuItemType, FileExtensionEnum } from "@/constants"
 import { usePathStore, useFileStore, UploadEventFromEnum } from "@/stores"
-
+import { cloneDeep } from "lodash"
+import { DialogPlugin } from "tdesign-vue-next"
 export class ContextMenu {
     private items: Array<ContentMenuItem> = []
 
@@ -284,8 +285,11 @@ export class ContextMenu {
             shortcutKey: `Ctrl+X`,
             color: 'primary',
             action: () => {
-                const { currentDirSelectedFiles } = usePathStore()
-                currentDirSelectedFiles.forEach(file => file.isShearing.value = true)
+                const { currentDirSelectedFiles, currentActionFiles } = usePathStore()
+                currentDirSelectedFiles.forEach(file => file.isCutting = true)
+                currentActionFiles.clear()
+                currentActionFiles.push(...currentDirSelectedFiles)
+                console.log(currentActionFiles, currentDirSelectedFiles);
             }
         })
         return this
@@ -299,8 +303,10 @@ export class ContextMenu {
             shortcutKey: `Ctrl+C`,
             color: 'primary',
             action: () => {
-                const { currentDirSelectedFiles } = usePathStore()
+                const { currentDirSelectedFiles, currentActionFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.isCopying = true)
+                currentActionFiles.clear()
+                currentActionFiles.push(...currentDirSelectedFiles)
             }
         })
         return this
@@ -322,16 +328,58 @@ export class ContextMenu {
         return this
     }
 
-    appendDelete() {
+    appendDelete(name: string = "删除") {
         this.items.push({
             type: 'icon',
-            name: '删除',
+            name,
             icon: 'delete',
             shortcutKey: `Delete`,
             color: 'danger',
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.delete())
+            }
+        })
+        return this
+    }
+
+
+    appendPaste(name: string = "粘贴") {
+        this.items.push({
+            type: 'icon',
+            name,
+            icon: 'paste',
+            color: 'primary',
+            action: () => {
+                const { currentActionFiles, currentDirFiles } = usePathStore()
+                // 复制、剪切到当前目录
+                for (let i = 0; i < currentActionFiles.length; i++) {
+                    const file = currentActionFiles[i]
+                    const newFile = cloneDeep(file)
+                    if (file.isCutting) {
+                        // 剪切
+                        file.isCutting = false
+                        const oldFile = currentDirFiles.find(_file => _file.hash === file.hash)
+                        if (oldFile) {
+                            const confirmDia = DialogPlugin({
+                                header: '源文件名和目标文件名相同',
+                                body: `文件名：${file.name}\n\n项目类型：${file.extension}\n${file.size}`,
+                                confirmBtn: '确认',
+                                cancelBtn: null,
+                                onConfirm: () => {
+                                    confirmDia.hide();
+                                },
+                            });
+                            continue
+                        }
+                    }
+                    if (file.isCopying) {
+                        // 复制
+                        file.isCopying = false
+                        newFile.name = `${newFile.notExtName} - (副本)${newFile.isFolder ? '' : '.' + newFile.extension}`
+                    }
+                    currentDirFiles.push(newFile)
+                }
             }
         })
         return this

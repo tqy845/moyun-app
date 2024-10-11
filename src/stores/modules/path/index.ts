@@ -17,6 +17,7 @@ export const usePathStore = defineStore(
     const isLoading = ref(false)
     const currentDirFiles = ref<Array<AggregateFile>>([])
     const currentDirSelectedFiles = ref<Array<AggregateFile>>([])
+    const currentActionFiles = ref<Array<AggregateFile>>([])
     const { isBaseLayout } = storeToRefs(useDirStore())
     const { readPhotoAlbum } = useDirStore()
     const { fileSortMode, fileSortType } = storeToRefs(useSettingStore())
@@ -111,6 +112,7 @@ export const usePathStore = defineStore(
       currentDir,
       currentDirFiles,
       currentDirSelectedFiles,
+      currentActionFiles,
 
       isSelected,
       clearSelected,

@@ -12,7 +12,7 @@ import { ContextMenu } from '@/models/ContextMenu'
 const containerRef = ref<HTMLElement>()
 
 const { clearSelected } = usePathStore()
-const { currentDir } = storeToRefs(usePathStore())
+const { currentDir, currentActionFiles } = storeToRefs(usePathStore())
 const controlState = useKeyModifier('Control')
 const { isOutside } = useMouseInElement(containerRef)
 const { focused } = useFocus(containerRef)
@@ -51,12 +51,25 @@ const createMenu = () => {
     return ContextMenu.builder().appendRefresh().build()
   }
 
-  return ContextMenu.builder()
+  const menus = ContextMenu.builder()
     .appendRefresh()
     .appendUpload()
     .appendNewFolder()
     .appendNewDocument()
     .build()
+
+
+  if (currentActionFiles.value.length) {
+    // 处理复制、剪切
+    const copyingArr = currentActionFiles.value.filter(file => file.isCopying)
+    const cutingArr = currentActionFiles.value.filter(file => file.isCutting)
+    if (copyingArr.length || cutingArr.length) {
+      menus.push(...ContextMenu.builder().appendPaste().build())
+    }
+
+  }
+
+  return menus
 }
 
 const menu = ref<Array<ContentMenuItem>>([])
@@ -71,7 +84,7 @@ onUpdated(resetMode)
 <template>
   <div ref="containerRef" class="h-full w-full pa-1 overflow-y-hidden">
     <TheContextMenu :menu="menu" class="h-full" @select="$event?.action()">
-      <component :is="currentMode" @click="clearSelected()" />
+      <component :is="currentMode" @click="clearSelected()" @contextmenu="clearSelected()" />
     </TheContextMenu>
   </div>
 </template>

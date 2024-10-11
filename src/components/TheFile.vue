@@ -70,7 +70,7 @@ const updated = () => {
 
 const copyStyles = computed(() => {
   const file = props.file
-  if (file.isShearing) return 'opacity-[0.4]'
+  if (file.isCutting) return 'opacity-[0.4]'
   return ''
 })
 

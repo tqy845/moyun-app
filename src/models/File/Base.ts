@@ -20,7 +20,7 @@ export default class Base {
   public deleteAt?: string
 
   public isDownloading = ref(false)
-  public isShearing = ref(false)
+  public isCutting = ref(false)
   public isCopying = ref(false)
   public isRenaming = ref(false)
   // 进度条
@@ -55,19 +55,19 @@ export default class Base {
   /**
    * 查看此文件/文件夹详情
    */
-  detail = async () => {}
+  detail = async () => { }
 
   /**
    * 分享此文件/文件夹
    */
-  shear = async () => {}
+  shear = async () => { }
 
   /**
    * 复制此文件/文件夹
    */
   copy = async () => {
     console.log(1);
-    
+
     this.isCopying.value = false
   }
 
@@ -92,7 +92,7 @@ export default class Base {
   /**
    * 同步此文件/文件夹
    */
-  sync = async () => {}
+  sync = async () => { }
 
   /**
    * 删除此文件/文件夹

@@ -21,7 +21,7 @@ const { control, x, c } = useMagicKeys()
 watchEffect(() => {
   if (control.value && x.value) {
     // 对当前选中的文件开启剪切操作
-    currentDirSelectedFiles.value.forEach((file) => (file.isShearing = true))
+    currentDirSelectedFiles.value.forEach((file) => (file.isCutting = true))
   } else if (control.value && c.value) {
     // 对当前选中的文件开启复制操作
     currentDirSelectedFiles.value.forEach((file) => (file.isCopying = true))
