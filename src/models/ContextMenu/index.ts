@@ -356,10 +356,10 @@ export class ContextMenu {
                 for (let i = 0; i < currentActionFiles.length; i++) {
                     const file = currentActionFiles[i]
                     const newFile = cloneDeep(file)
+                    const oldFile = currentDirFiles.find(_file => _file.hash === file.hash)
                     if (file.isCutting) {
                         // 剪切
                         file.isCutting = false
-                        const oldFile = currentDirFiles.find(_file => _file.hash === file.hash)
                         if (oldFile) {
                             const confirmDia = DialogPlugin({
                                 header: '源文件名和目标文件名相同',
@@ -376,7 +376,9 @@ export class ContextMenu {
                     if (file.isCopying) {
                         // 复制
                         file.isCopying = false
-                        newFile.name = `${newFile.notExtName} - (副本)${newFile.isFolder ? '' : '.' + newFile.extension}`
+                        if (oldFile) {
+                            newFile.name = `${newFile.notExtName} - (副本)${newFile.isFolder ? '' : '.' + newFile.extension}`
+                        }
                     }
                     currentDirFiles.push(newFile)
                 }
