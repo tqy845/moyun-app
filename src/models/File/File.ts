@@ -1,10 +1,10 @@
-import { CONTEXT_MENU_ITEM, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
+import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
 import Base from './Base'
-import { singleContextmenuFactory } from './enum'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
 import { fileUtils } from '@/utils/functions'
 import { usePreviewStore } from '@/stores'
+import { ContextMenu } from '../ContextMenu'
 
 /**
  * 文件类
@@ -18,7 +18,7 @@ export default class File extends Base {
     // 级别
     level: number
     // 菜单项
-    menuItems: Array<CONTEXT_MENU_ITEM>
+    menuItems: Array<ContentMenuItem>
   }
 
   constructor(object: FileRawModel, options?: Prototype) {
@@ -27,7 +27,11 @@ export default class File extends Base {
       group: options?.group ?? GroupEnum.USER,
       level: options?.level ?? FileLevelEnum.OTHER,
       type: FileExtensionEnum.FILE,
-      menuItems: singleContextmenuFactory(this, ...(options?.menuItems || []))
+      menuItems: ContextMenu.builder()
+        .appendOpen()
+        .appendLookAttr()
+        .build()
+        .concat(options?.menuItems || [])
     })
   }
 

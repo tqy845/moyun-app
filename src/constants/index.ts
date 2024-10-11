@@ -159,9 +159,9 @@ export const sortModeOptions: Array<{ content: string; value: SortModeEnum; divi
   { content: '递减', value: SortModeEnum.DOWN }
 ]
 
-
-export type CONTEXT_MENU_ITEM = {
-  type: 'text' | 'icon'
+export type ContentMenuItemType = 'text' | 'icon'
+export type ContentMenuItem = {
+  type: ContentMenuItemType
   name: string
   action: () => any
   icon?: string

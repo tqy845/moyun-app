@@ -5,7 +5,7 @@ import { Prototype } from '@/models/File/interface'
 import { FileRawModel } from '@/api/models/fileModel'
 import fileClass from '@/assets/fileClass.json'
 import { fileUtils, videoUtils, imageUtils } from '@/utils/functions'
-import { MenuItemEnum } from '@/models/File/enum'
+import { ContextMenu } from '@/models/ContextMenu'
 
 export default {
   isFile(file: FileRawModel | MYFile | Folder) {
@@ -84,7 +84,7 @@ export default {
     file: File,
     ext: string,
     maxWidth = 512,
-    maxHeight =  512
+    maxHeight = 512
   ): Promise<string> {
     if (this.isImageType(ext)) {
       return imageUtils.imageThumbnail(file, 'webp', maxWidth, maxHeight)
@@ -114,11 +114,24 @@ export default {
    * @returns 文件/文件夹实例
    */
   metadataConversionFileInstance(fileRawModel: FileRawModel) {
-    const { Delete, Copy, Cut, Quick, Rename, Download } = MenuItemEnum
     const menuItems = fileUtils.isFile(fileRawModel)
       ? //  根据不同的类型，返回不同的菜单
-      [Download, Cut, Copy, Rename, Delete]
-      : [Download, Cut, Copy, Rename, Delete, Quick]
+      ContextMenu.builder()
+        .appendDownload()
+        .appendCut()
+        .appendCopy()
+        .appendRename()
+        .appendDelete()
+        .build()
+
+      : ContextMenu.builder()
+        .appendDownload()
+        .appendCut()
+        .appendCopy()
+        .appendRename()
+        .appendDelete()
+        .appendFixedQuick()
+        .build()
 
     return fileUtils.newFileObject(fileRawModel, {
       menuItems

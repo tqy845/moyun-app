@@ -5,7 +5,7 @@
  * 创建日期： 2024/03/18
  * 作者： 谭期元
  */
-import { CONTEXT_MENU_ITEM } from '@/constants'
+import { ContentMenuItem } from '@/constants'
 import Folder from '@/models/File/Folder'
 
 defineProps({
@@ -19,7 +19,7 @@ const handleClick = (_: unknown, folder: Folder) => {
   folder.open()
 }
 
-const handleSelected = (item: CONTEXT_MENU_ITEM) => {
+const handleSelected = (item: ContentMenuItem) => {
   item.action(folderRef.value)
 }
 

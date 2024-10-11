@@ -4,7 +4,7 @@ import { MOUSE_DIRECTION } from '@/utils/functions/mouse-functions'
 import { useFileStore, useSettingStore, usePathStore } from '@/stores'
 import IconMode from './components/IconMode.vue'
 import ListMode from './components/ListMode.vue'
-import { CONTEXT_MENU_ITEM, MoYunModeEnum } from '@/constants'
+import { ContentMenuItem, MoYunModeEnum } from '@/constants'
 import TheContextMenu from '@/components/TheContextMenu.vue'
 import { resetMode } from '@/stores/modules/file/helper'
 import { ContextMenu } from '@/models/ContextMenu'
@@ -59,7 +59,7 @@ const createMenu = () => {
     .build()
 }
 
-const menu = ref<Array<CONTEXT_MENU_ITEM>>([])
+const menu = ref<Array<ContentMenuItem>>([])
 watchEffect(() => {
   menu.value.clear()
   menu.value.push(...createMenu())

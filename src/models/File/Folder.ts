@@ -1,10 +1,10 @@
-import { CONTEXT_MENU_ITEM, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
+import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
 import Base from './Base'
 import { useDirStore, usePathStore } from '@/stores'
 import Dir from './Dir'
-import { singleContextmenuFactory } from './enum'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
+import { ContextMenu } from '../ContextMenu'
 
 export default class Folder extends Base {
   readonly __prototype__: {
@@ -15,7 +15,7 @@ export default class Folder extends Base {
     // 级别
     level: number
     // 菜单项
-    menuItems: Array<CONTEXT_MENU_ITEM>
+    menuItems: Array<ContentMenuItem>
   }
 
   constructor(object: FileRawModel, options?: Prototype) {
@@ -24,7 +24,11 @@ export default class Folder extends Base {
       group: options?.group ?? GroupEnum.USER,
       level: options?.level ?? FileLevelEnum.OTHER,
       type: FileExtensionEnum.FOLDER,
-      menuItems: singleContextmenuFactory(this, ...(options?.menuItems || []))
+      menuItems: ContextMenu.builder()
+        .appendOpen()
+        .appendLookAttr()
+        .build()
+        .concat(options?.menuItems || [])
     })
   }
 
@@ -60,5 +64,5 @@ export default class Folder extends Base {
     historyChildren.value.length = 0
   }
 
-  quick = async () => {}
+  quick = async () => { }
 }

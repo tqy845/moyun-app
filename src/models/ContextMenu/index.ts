@@ -1,8 +1,8 @@
-import { CONTEXT_MENU_ITEM, FileExtensionEnum } from "@/constants"
+import { ContentMenuItem, ContentMenuItemType, FileExtensionEnum } from "@/constants"
 import { usePathStore, useFileStore, UploadEventFromEnum } from "@/stores"
 
 export class ContextMenu {
-    private items: Array<CONTEXT_MENU_ITEM> = []
+    private items: Array<ContentMenuItem> = []
 
     private constructor() {
     }
@@ -154,8 +154,25 @@ export class ContextMenu {
             name,
             value: 'fixed-quick',
             prefixIcon: `pin`,
-            action: () => '',
-            divider: true
+            icon: "pin",
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.quick(true))
+            }
+        })
+        return this
+    }
+
+
+    appendCancelFixedQuick() {
+        this.items.push({
+            type: 'text',
+            name: '从“快捷访问”取消固定',
+            icon: 'pin',
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.quick(false))
+            }
         })
         return this
     }
@@ -217,11 +234,115 @@ export class ContextMenu {
         return this
     }
 
+    appendOpen(name: string = "打开") {
+        this.items.push({
+            type: 'text',
+            name,
+            icon: 'gesture-up-1',
+            shortcutKey: `Enter`,
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.open())
+            }
+        })
+        return this
+    }
+
+    appendLookAttr(name: string = '属性') {
+        this.items.push({
+            type: 'text',
+            name,
+            icon: 'tools',
+            shortcutKey: `Alt+Enter`,
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.detail())
+            }
+        })
+        return this
+    }
+
+    appendDownload(name: string = "下载", type: ContentMenuItemType = "icon") {
+        this.items.push({
+            type,
+            name,
+            icon: 'cloud-download',
+            color: 'primary',
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.download())
+            }
+        })
+        return this
+    }
+
+    appendCut() {
+        this.items.push({
+            type: 'icon',
+            name: '剪切',
+            icon: 'cut',
+            shortcutKey: `Ctrl+X`,
+            color: 'primary',
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.isShearing.value = true)
+            }
+        })
+        return this
+    }
+
+    appendCopy() {
+        this.items.push({
+            type: 'icon',
+            name: '复制',
+            icon: 'copy',
+            shortcutKey: `Ctrl+C`,
+            color: 'primary',
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.isCopying.value = true)
+            }
+        })
+        return this
+    }
+
+
+    appendRename() {
+        this.items.push({
+            type: 'icon',
+            name: '重命名',
+            icon: 'edit-2',
+            shortcutKey: `F2`,
+            color: 'primary',
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.isRenaming.value = true)
+            }
+        })
+        return this
+    }
+
+    appendDelete() {
+        this.items.push({
+            type: 'icon',
+            name: '删除',
+            icon: 'delete',
+            shortcutKey: `Delete`,
+            color: 'danger',
+            action: () => {
+                const { currentDirFiles } = usePathStore()
+                currentDirFiles.forEach(file => file.delete())
+            }
+        })
+        return this
+    }
+
+
     /**
      * 构建菜单
-     * @returns {CONTEXT_MENU_ITEM[]}
+     * @returns {ContentMenuItem[]}
      */
-    build(): CONTEXT_MENU_ITEM[] {
+    build(): ContentMenuItem[] {
         return this.items
     }
 }

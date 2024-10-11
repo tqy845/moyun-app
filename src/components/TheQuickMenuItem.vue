@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { CONTEXT_MENU_ITEM, FlagEnum } from '@/constants'
+import { ContentMenuItem, FlagEnum } from '@/constants'
 import Folder from '@/models/File/Folder'
 
 defineProps({
@@ -12,7 +12,7 @@ const handleClick = (_: unknown, folder: Folder) => {
   folder.open()
 }
 
-const handleSelected = (item: CONTEXT_MENU_ITEM) => {
+const handleSelected = (item: ContentMenuItem) => {
   item.action(folderRef.value)
 }
 

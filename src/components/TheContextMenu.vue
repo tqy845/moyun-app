@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { mouseUtils } from '@/utils/functions'
 import { useSystemStore } from '@/stores'
-import { CONTEXT_MENU_ITEM } from '@/constants'
+import { ContentMenuItem } from '@/constants'
 
 const props = defineProps({
   menu: {
-    type: Array<CONTEXT_MENU_ITEM>,
+    type: Array<ContentMenuItem>,
     default: () => []
   }
 })
@@ -28,7 +28,7 @@ const { x, y, visible } = mouseUtils.contextMenu(containerRef, innerSize)
 const textMenu = computed(() => props.menu.filter((item) => item.type === 'text'))
 const iconMenu = computed(() => props.menu.filter((item) => item.type === 'icon'))
 
-const handleSelected = (menuItem: CONTEXT_MENU_ITEM) => {
+const handleSelected = (menuItem: ContentMenuItem) => {
   emit('select', menuItem)
   visible.value = false
 }
