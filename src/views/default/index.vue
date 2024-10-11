@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { mouseUtils } from '@/utils/functions'
 import { MOUSE_DIRECTION } from '@/utils/functions/mouse-functions'
-import { useFileStore, useSettingStore, usePathStore, useDirStore } from '@/stores'
+import { useFileStore, useSettingStore, usePathStore } from '@/stores'
 import IconMode from './components/IconMode.vue'
 import ListMode from './components/ListMode.vue'
-import { CONTEXT_MENU_ITEM, explorerContextMenuList, MoYunModeEnum } from '@/constants'
+import { CONTEXT_MENU_ITEM, MoYunModeEnum } from '@/constants'
 import TheContextMenu from '@/components/TheContextMenu.vue'
 import { resetMode } from '@/stores/modules/file/helper'
+import { ContextMenu } from '@/models/ContextMenu'
 
 const containerRef = ref<HTMLElement>()
 
@@ -15,7 +16,6 @@ const { currentDir } = storeToRefs(usePathStore())
 const controlState = useKeyModifier('Control')
 const { isOutside } = useMouseInElement(containerRef)
 const { focused } = useFocus(containerRef)
-const { isBaseLayout } = storeToRefs(useDirStore())
 
 const { mode } = storeToRefs(useFileStore())
 const settingStore = useSettingStore()
@@ -43,10 +43,26 @@ const eventResetSize = () => {
 const isPhotoAlbum = computed(() => currentDir.value.rawFolder.name === '图库')
 const isDustbin = computed(() => currentDir.value.rawFolder.name === '回收站')
 
-const menu = computed(() => {
-  if (isPhotoAlbum.value) return explorerContextMenuList.slice(0, 1)
-  if (isDustbin.value) return explorerContextMenuList.slice(0, 1)
-  return explorerContextMenuList
+const createMenu = () => {
+  if (isPhotoAlbum.value) {
+    return ContextMenu.builder().appendRefresh().build()
+  }
+  if (isDustbin.value) {
+    return ContextMenu.builder().appendRefresh().build()
+  }
+
+  return ContextMenu.builder()
+    .appendRefresh()
+    .appendUpload()
+    .appendNewFolder()
+    .appendNewDocument()
+    .build()
+}
+
+const menu = ref<Array<CONTEXT_MENU_ITEM>>([])
+watchEffect(() => {
+  menu.value.clear()
+  menu.value.push(...createMenu())
 })
 
 onMounted(eventResetSize)

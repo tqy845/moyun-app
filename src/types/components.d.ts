@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TAlert: typeof import('tdesign-vue-next')['Alert']
     TAside: typeof import('tdesign-vue-next')['Aside']
     TAutoComplete: typeof import('tdesign-vue-next')['AutoComplete']
     TAvatar: typeof import('tdesign-vue-next')['Avatar']
@@ -29,7 +28,6 @@ declare module 'vue' {
     TFooter: typeof import('tdesign-vue-next')['Footer']
     TForm: typeof import('tdesign-vue-next')['Form']
     TFormItem: typeof import('tdesign-vue-next')['FormItem']
-    TGuide: typeof import('tdesign-vue-next')['Guide']
     THeader: typeof import('tdesign-vue-next')['Header']
     TheBasicMenuItem: typeof import('./../components/TheBasicMenuItem.vue')['default']
     TheContextMenu: typeof import('./../components/TheContextMenu.vue')['default']

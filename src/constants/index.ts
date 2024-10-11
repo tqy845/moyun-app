@@ -1,5 +1,3 @@
-import { UploadEventFromEnum, usePathStore, useFileStore } from '@/stores'
-
 // 标签类型
 type TagTheme = 'default' | 'success' | 'primary' | 'warning' | 'danger'
 // 通知的优先级对应的标签类型
@@ -89,38 +87,44 @@ export enum SortModeEnum {
   DOWN = 'down'
 }
 
-export const modeOptions = [
-  {
-    content: '超大图标',
-    size: '20',
-    value: MoYunModeEnum.SUPER_BIG_ICON,
-    prefixIcon: `component-grid`
-  },
-  {
-    content: '大图标',
-    size: '16',
-    value: MoYunModeEnum.BIG_ICON,
-    prefixIcon: `component-grid`
-  },
-  {
-    content: '中图标',
-    size: '13',
-    value: MoYunModeEnum.MEDIUM_ICON,
-    prefixIcon: `component-grid`
-  },
-  {
-    content: '小图标',
-    size: '10',
-    value: MoYunModeEnum.SMALL_ICON,
-    prefixIcon: `component-grid`
-  },
-  {
-    content: '列表',
-    size: 'medium',
-    value: MoYunModeEnum.LIST,
-    prefixIcon: `list`
-  }
-]
+export const modeOptions: Array<{
+  content: string,
+  size: string,
+  value: MoYunModeEnum,
+  prefixIcon: string,
+  divider?: boolean
+}> = [
+    {
+      content: '超大图标',
+      size: '20',
+      value: MoYunModeEnum.SUPER_BIG_ICON,
+      prefixIcon: `component-grid`
+    },
+    {
+      content: '大图标',
+      size: '16',
+      value: MoYunModeEnum.BIG_ICON,
+      prefixIcon: `component-grid`
+    },
+    {
+      content: '中图标',
+      size: '13',
+      value: MoYunModeEnum.MEDIUM_ICON,
+      prefixIcon: `component-grid`
+    },
+    {
+      content: '小图标',
+      size: '10',
+      value: MoYunModeEnum.SMALL_ICON,
+      prefixIcon: `component-grid`
+    },
+    {
+      content: '列表',
+      size: 'medium',
+      value: MoYunModeEnum.LIST,
+      prefixIcon: `list`
+    }
+  ]
 
 export const assembleOptions = [
   {
@@ -131,45 +135,6 @@ export const assembleOptions = [
   {
     content: '添加新集合',
     value: MoYunAssembleEnum.CUSTOM
-  }
-]
-
-export const newOptions: Array<{
-  content: string
-  value: Exclude<FileExtensionEnum, FileExtensionEnum.MAIN>
-  prefixIcon: string
-  moreIcon?: boolean
-  divider?: boolean
-  action: () => void
-}> = [
-  {
-    content: '上传文件',
-    value: FileExtensionEnum.UPLOAD,
-    prefixIcon: `cloudupload-fill`,
-    moreIcon: true,
-    divider: true,
-    action: () => {
-      const { showUploadArea } = useFileStore()
-      showUploadArea()
-    }
-  },
-  {
-    content: '文件夹',
-    value: FileExtensionEnum.FOLDER,
-    prefixIcon: `folder`,
-    action: () => {
-      const { createFolder } = useFileStore()
-      createFolder()
-    }
-  },
-  {
-    content: '文本文档',
-    value: FileExtensionEnum.FILE,
-    prefixIcon: `file-1`,
-    action: () => {
-      const { createDocument } = useFileStore()
-      createDocument()
-    }
   }
 ]
 
@@ -194,117 +159,19 @@ export const sortModeOptions: Array<{ content: string; value: SortModeEnum; divi
   { content: '递减', value: SortModeEnum.DOWN }
 ]
 
-export const moreOptions: Array<{
-  content: string
-  value: string
-  prefixIcon?: string
-  action: () => void
-  divider?: boolean
-}> = [
-  {
-    content: '撤销',
-    value: 'repeal',
-    prefixIcon: `rollback`,
-    divider: true,
-    action: () => {}
-  },
-  {
-    content: '固定到快捷访问',
-    value: 'fixed-quick',
-    prefixIcon: `pin`,
-    // FileService.getInstance().quick(file)
-    action: () => '',
-    divider: true
-  },
-  {
-    content: '全部选择',
-    value: 'all',
-    prefixIcon: `check-circle`,
-    action: () => {
-      const { allSelected } = usePathStore()
-      allSelected()
-    }
-  },
-  {
-    content: '全部取消',
-    value: 'all-cancel',
-    prefixIcon: `minus-circle`,
-    action: () => {
-      const { clearSelected } = usePathStore()
-      clearSelected()
-    }
-  },
-  {
-    content: '反向选择',
-    value: 'reverse',
-    prefixIcon: `error-circle`,
-    action: () => {
-      const { reverseSelected } = usePathStore()
-      reverseSelected()
-    }
-  }
-]
 
 export type CONTEXT_MENU_ITEM = {
-  id: number
   type: 'text' | 'icon'
   name: string
-  icon: string
+  action: () => any
+  icon?: string
+  prefixIcon?: string
   shortcutKey?: string
   color?: 'default' | 'primary' | 'danger' | 'success' | 'warning'
-  action: Function
+  value?: string
+  moreIcon?: boolean
+  divider?: boolean
 }
-
-export const explorerContextMenuList: Array<CONTEXT_MENU_ITEM> = [
-  {
-    id: 1,
-    type: 'text',
-    name: '刷新',
-    icon: 'refresh',
-    color: 'primary',
-    shortcutKey: `F5`,
-    action: () => {
-      const { children } = usePathStore()
-      children.peek()!.refresh()
-    }
-  },
-  {
-    id: 2,
-    type: 'text',
-    name: '上传',
-    icon: 'cloud-upload',
-    color: 'primary',
-    shortcutKey: ``,
-    action: () => {
-      const { triggerUpload } = useFileStore()
-      triggerUpload(UploadEventFromEnum.outside)
-    }
-  },
-  {
-    id: 3,
-    type: 'text',
-    name: '新建文件夹',
-    icon: 'folder',
-    color: 'primary',
-    shortcutKey: ``,
-    action: () => {
-      const { createFolder } = useFileStore()
-      createFolder()
-    }
-  },
-  {
-    id: 4,
-    type: 'text',
-    name: '新建文本文档',
-    icon: 'file-1',
-    color: 'primary',
-    shortcutKey: ``,
-    action: () => {
-      const { createDocument } = useFileStore()
-      createDocument()
-    }
-  }
-]
 
 export enum FILE_MODE {
   LOCAL = 0 // 仅本地

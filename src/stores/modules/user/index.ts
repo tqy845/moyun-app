@@ -6,7 +6,7 @@ import { useDirStore, useSystemStore } from '@/stores'
 import { User } from '@/models/User'
 import { router } from '@/router'
 
-export const useUserStore = defineStore('user-store', ()=>{
+export const useUserStore = defineStore('user-store', () => {
   const loginInfo = ref({
     email: '',
     password: '',
@@ -16,17 +16,17 @@ export const useUserStore = defineStore('user-store', ()=>{
   const endpoint = ref("")
   const user = ref({
     id: 0,
-      username: '',
-      realName: '',
-      password: '',
-      email: ''
+    username: '',
+    realName: '',
+    password: '',
+    email: ''
   })
 
   /**
      * 登录
      * @param form 登录信息
      */
-  const login = async (form: UserLoginModel)=> {
+  const login = async (form: UserLoginModel) => {
     try {
       // 是否记住我
       if (form.remember) {
@@ -53,7 +53,7 @@ export const useUserStore = defineStore('user-store', ()=>{
   /**
    * 退出
    */
-  const exit = (toLoginPage: boolean = true) =>{
+  const exit = (toLoginPage: boolean = true) => {
     const systemStore = useSystemStore()
     // const fileStore = useFileStore()
     systemStore.$reset()
@@ -63,7 +63,7 @@ export const useUserStore = defineStore('user-store', ()=>{
   /**
    * 获取用户信息
    */
-  const  userinfo = async() =>{
+  const userinfo = async () => {
     const result = await getUserInfo<{ user: User }>()
     Object.assign(user, result.user)
     return
@@ -75,15 +75,18 @@ export const useUserStore = defineStore('user-store', ()=>{
     endpoint,
     user,
 
-    login , 
-    exit ,
+    login,
+    exit,
     userinfo
   }
-},{
-  persist:[
+}, {
+  persist: [
     {
-      storage:sessionStorage,
-      paths:['token','user','endpoint','loginInfo']
+      storage: localStorage,
+      paths: ['user', 'loginInfo']
+    }, {
+      storage: sessionStorage,
+      paths: ['token', 'endpoint']
     }
   ]
 })

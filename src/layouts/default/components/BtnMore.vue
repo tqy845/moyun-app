@@ -1,8 +1,19 @@
 <script lang="ts" setup>
-import { moreOptions } from '@/constants'
+import { ContextMenu } from '@/models/ContextMenu';
 import { usePathStore } from '@/stores'
 const { currentDirSelectedFiles } = usePathStore()
-const executed = async () => {}
+
+const options = ContextMenu.builder()
+  .appendRepeal()
+  .appendDivider()
+  .appendFixedQuick()
+  .appendDivider()
+  .appendAllSelected()
+  .appendAllCancel()
+  .appendReverseSelected()
+  .build()
+
+const executed = async () => { }
 
 onMounted(executed)
 </script>
@@ -14,18 +25,13 @@ onMounted(executed)
         <TheIcon name="ellipsis" />
       </t-button>
       <t-dropdown-menu>
-        <t-dropdown-item
-          v-for="item in moreOptions"
-          :key="item.value"
-          :value="item.value"
-          :divider="item.divider"
-          @click="item.action"
-        >
+        <t-dropdown-item v-for="item in options" :key="item.value" :value="item.value" :divider="item.divider"
+          @click="item.action">
           <span class="mr-2">
             <TheIcon :name="item.prefixIcon || ''" />
           </span>
           <span class="text-size-xs">
-            {{ item.content }}
+            {{ item.name }}
           </span>
         </t-dropdown-item>
       </t-dropdown-menu>
