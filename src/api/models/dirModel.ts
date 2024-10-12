@@ -1,4 +1,4 @@
-import { FileRawModel } from '@/api/models/fileModel'
+import { FileCopyOptionModel, FileRawModel } from '@/api/models/fileModel'
 
 export interface QueryDirectoryModel {
   page: number
@@ -7,6 +7,10 @@ export interface QueryDirectoryModel {
 
 
 export interface AsideMenuModel {
-  name:string
+  name: string
   children: Array<FileRawModel>
+}
+
+export interface FolderCopyOptionModel extends FileCopyOptionModel {
+
 }

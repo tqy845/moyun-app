@@ -134,13 +134,6 @@ const transform: FetchTransform = {
 
   //响应拦截器处理
   responseInterceptors: async (response, notify): Promise<Response> => {
-    // 判断是否为 204 No Content
-    if (response.status === 204) {
-      // 204 没有内容，直接返回空值或处理成功状态
-      return response
-    }
-    console.log('response', response.status, response.statusText, response.ok);
-
     // 检查 HTTP 状态码
     if (!response.ok || response.status === 401) {
       const errorMessage = getErrorMessage(response.status)

@@ -1,12 +1,14 @@
 import { ContentMenuItem, ContentMenuItemType, FileExtensionEnum } from "@/constants"
 import { usePathStore, useFileStore, UploadEventFromEnum } from "@/stores"
 import { cloneDeep } from "lodash"
-import { DialogPlugin } from "tdesign-vue-next"
+
+
+type ColorType = "default" | "primary" | "danger" | "success" | "warning" | undefined
+
 export class ContextMenu {
     private items: Array<ContentMenuItem> = []
 
-    private constructor() {
-    }
+    private constructor() { }
 
     static builder() {
         return new ContextMenu()
@@ -27,15 +29,18 @@ export class ContextMenu {
     /**
      * 添加“刷新”选项
      * @param {string} [name="刷新"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
+     * @param {string} [shortcutKey="F5"] - 快捷键
      * @returns {ContextMenu}
      */
-    appendRefresh(name: string = "刷新"): ContextMenu {
+    appendRefresh(name: string = "刷新", type: ContentMenuItemType = 'text', color: ColorType = 'primary', shortcutKey: string = 'F5'): ContextMenu {
         this.items.push({
-            type: 'text',
+            type,
             name,
             icon: 'refresh',
-            color: 'primary',
-            shortcutKey: `F5`,
+            color,
+            shortcutKey,
             action: () => {
                 const { children } = usePathStore()
                 children.peek()!.refresh()
@@ -47,14 +52,17 @@ export class ContextMenu {
     /**
      * 添加“上传文件区域”选项
      * @param {string} [name="上传文件"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendUploadArea(name: string = "上传文件"): ContextMenu {
+    appendUploadArea(name: string = "上传文件", type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: "text",
+            type,
             name,
             value: FileExtensionEnum.UPLOAD,
             prefixIcon: `cloudupload-fill`,
+            color,
             moreIcon: true,
             action: () => {
                 const { showUploadArea } = useFileStore()
@@ -67,14 +75,16 @@ export class ContextMenu {
     /**
      * 添加“上传”选项
      * @param {string} [name="上传"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendUpload(name: string = "上传"): ContextMenu {
+    appendUpload(name: string = "上传", type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'text',
+            type,
             name,
             icon: 'cloud-upload',
-            color: 'primary',
+            color,
             shortcutKey: ``,
             action: () => {
                 const { triggerUpload } = useFileStore()
@@ -87,14 +97,16 @@ export class ContextMenu {
     /**
      * 添加“新建文件夹”选项
      * @param {string} [name="新建文件夹"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendNewFolder(name: string = "新建文件夹"): ContextMenu {
+    appendNewFolder(name: string = "新建文件夹", type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'text',
+            type,
             name,
             icon: 'folder',
-            color: 'primary',
+            color,
             shortcutKey: ``,
             value: FileExtensionEnum.FOLDER,
             prefixIcon: `folder`,
@@ -109,14 +121,16 @@ export class ContextMenu {
     /**
      * 添加“新建文本文档”选项
      * @param {string} [name="新建文本文档"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendNewDocument(name: string = "新建文本文档"): ContextMenu {
+    appendNewDocument(name: string = "新建文本文档", type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'text',
+            type,
             name,
             icon: 'file-1',
-            color: 'primary',
+            color,
             shortcutKey: ``,
             value: FileExtensionEnum.FILE,
             prefixIcon: `file-1`,
@@ -131,11 +145,12 @@ export class ContextMenu {
     /**
      * 添加“撤销”选项
      * @param {string} [name="撤销"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
      * @returns {ContextMenu}
      */
-    appendRepeal(name: string = "撤销"): ContextMenu {
+    appendRepeal(name: string = "撤销", type: ContentMenuItemType = 'text'): ContextMenu {
         this.items.push({
-            type: "text",
+            type,
             name,
             value: 'repeal',
             prefixIcon: `rollback`,
@@ -147,15 +162,17 @@ export class ContextMenu {
     /**
      * 添加“固定到快捷访问”选项
      * @param {string} [name="固定到快捷访问"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendFixedQuick(name: string = '固定到快捷访问'): ContextMenu {
+    appendFixedQuick(name: string = '固定到快捷访问', type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: "text",
+            type,
             name,
             value: 'fixed-quick',
             prefixIcon: `pin`,
-            icon: "pin",
+            color,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.quick(true))
@@ -164,11 +181,16 @@ export class ContextMenu {
         return this
     }
 
-
-    appendCancelFixedQuick() {
+    /**
+     * 添加“从快捷访问取消固定”选项
+     * @param {string} [name="从快捷访问取消固定"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @returns {ContextMenu}
+     */
+    appendCancelFixedQuick(name: string = '从快捷访问取消固定', type: ContentMenuItemType = 'text'): ContextMenu {
         this.items.push({
-            type: 'text',
-            name: '从“快捷访问”取消固定',
+            type,
+            name,
             icon: 'pin',
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
@@ -181,14 +203,17 @@ export class ContextMenu {
     /**
      * 添加“全部选择”选项
      * @param {string} [name="全部选择"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendAllSelected(name: string = '全部选择'): ContextMenu {
+    appendAllSelected(name: string = '全部选择', type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: "text",
+            type,
             name,
             value: 'all',
             prefixIcon: `check-circle`,
+            color,
             action: () => {
                 const { allSelected } = usePathStore()
                 allSelected()
@@ -200,14 +225,17 @@ export class ContextMenu {
     /**
      * 添加“全部取消选择”选项
      * @param {string} [name="全部取消"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendAllCancel(name: string = '全部取消'): ContextMenu {
+    appendAllCancel(name: string = '全部取消', type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: "text",
+            type,
             name,
             value: 'all-cancel',
             prefixIcon: `minus-circle`,
+            color,
             action: () => {
                 const { clearSelected } = usePathStore()
                 clearSelected()
@@ -219,14 +247,17 @@ export class ContextMenu {
     /**
      * 添加“反向选择”选项
      * @param {string} [name="反向选择"] - 菜单项名称
+     * @param {ContentMenuItemType} [type="text"] - 菜单项类型
+     * @param {ColorType} [color="primary"] - 菜单项颜色
      * @returns {ContextMenu}
      */
-    appendReverseSelected(name: string = '反向选择'): ContextMenu {
+    appendReverseSelected(name: string = '反向选择', type: ContentMenuItemType = 'text', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: "text",
+            type,
             name,
             value: 'reverse',
-            prefixIcon: `error-circle`,
+            prefixIcon: `redo`,
+            color,
             action: () => {
                 const { reverseSelected } = usePathStore()
                 reverseSelected()
@@ -235,12 +266,12 @@ export class ContextMenu {
         return this
     }
 
-    appendOpen(name: string = "打开") {
+    appendOpen(name: string = "打开", type: ContentMenuItemType = 'text', shortcutKey: string = 'Enter'): ContextMenu {
         this.items.push({
-            type: 'text',
+            type,
             name,
             icon: 'gesture-up-1',
-            shortcutKey: `Enter`,
+            shortcutKey,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.open())
@@ -249,12 +280,12 @@ export class ContextMenu {
         return this
     }
 
-    appendLookAttr(name: string = '属性') {
+    appendLookAttr(name: string = '属性', type: ContentMenuItemType = 'text', shortcutKey: string = 'Alt+Enter'): ContextMenu {
         this.items.push({
-            type: 'text',
+            type,
             name,
             icon: 'tools',
-            shortcutKey: `Alt+Enter`,
+            shortcutKey,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.detail())
@@ -263,12 +294,13 @@ export class ContextMenu {
         return this
     }
 
-    appendDownload(name: string = "下载", type: ContentMenuItemType = "icon") {
+    appendDownload(name: string = "下载", type: ContentMenuItemType = 'icon', shortcutKey: string = '', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
             type,
             name,
             icon: 'cloud-download',
-            color: 'primary',
+            color,
+            shortcutKey,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.download())
@@ -277,31 +309,31 @@ export class ContextMenu {
         return this
     }
 
-    appendCut() {
+    appendCut(name: string = '剪切', type: ContentMenuItemType = 'icon', shortcutKey: string = 'Ctrl+X', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'icon',
-            name: '剪切',
+            type,
+            name,
             icon: 'cut',
-            shortcutKey: `Ctrl+X`,
-            color: 'primary',
+            shortcutKey,
+            color,
             action: () => {
                 const { currentDirSelectedFiles, currentActionFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.isCutting = true)
                 currentActionFiles.clear()
                 currentActionFiles.push(...currentDirSelectedFiles)
-                console.log(currentActionFiles, currentDirSelectedFiles);
+                console.log(currentActionFiles, currentDirSelectedFiles)
             }
         })
         return this
     }
 
-    appendCopy() {
+    appendCopy(name: string = '复制', type: ContentMenuItemType = 'icon', shortcutKey: string = 'Ctrl+C', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'icon',
-            name: '复制',
+            type,
+            name,
             icon: 'copy',
-            shortcutKey: `Ctrl+C`,
-            color: 'primary',
+            shortcutKey,
+            color,
             action: () => {
                 const { currentDirSelectedFiles, currentActionFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.isCopying = true)
@@ -312,14 +344,13 @@ export class ContextMenu {
         return this
     }
 
-
-    appendRename() {
+    appendRename(name: string = '重命名', type: ContentMenuItemType = 'icon', shortcutKey: string = 'F2', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'icon',
-            name: '重命名',
+            type,
+            name,
             icon: 'edit-2',
-            shortcutKey: `F2`,
-            color: 'primary',
+            shortcutKey,
+            color,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.isRenaming.value = true)
@@ -328,13 +359,13 @@ export class ContextMenu {
         return this
     }
 
-    appendDelete(name: string = "删除") {
+    appendDelete(name: string = '删除', type: ContentMenuItemType = 'icon', shortcutKey: string = 'Delete', color: ColorType = 'danger'): ContextMenu {
         this.items.push({
-            type: 'icon',
+            type,
             name,
             icon: 'delete',
-            shortcutKey: `Delete`,
-            color: 'danger',
+            shortcutKey,
+            color,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.delete())
@@ -343,56 +374,22 @@ export class ContextMenu {
         return this
     }
 
-
-    appendPaste(name: string = "粘贴") {
+    appendPaste(name: string = "粘贴", type: ContentMenuItemType = 'icon', color: ColorType = 'primary'): ContextMenu {
         this.items.push({
-            type: 'icon',
+            type,
             name,
             icon: 'paste',
-            color: 'primary',
+            color,
             action: () => {
-                const { currentActionFiles, currentDirFiles } = usePathStore()
-                // 复制、剪切到当前目录
-                for (let i = 0; i < currentActionFiles.length; i++) {
-                    const file = currentActionFiles[i]
-                    const newFile = cloneDeep(file)
-                    const oldFile = currentDirFiles.find(_file => _file.hash === file.hash)
-                    if (file.isCutting) {
-                        // 剪切
-                        file.isCutting = false
-                        if (oldFile) {
-                            const confirmDia = DialogPlugin({
-                                header: '源文件名和目标文件名相同',
-                                body: `文件名：${file.name}\n\n项目类型：${file.extension}\n${file.size}`,
-                                confirmBtn: '确认',
-                                cancelBtn: null,
-                                onConfirm: () => {
-                                    confirmDia.hide();
-                                },
-                            });
-                            continue
-                        }
-                    }
-                    if (file.isCopying) {
-                        // 复制
-                        file.isCopying = false
-                        if (oldFile) {
-                            newFile.name = `${newFile.notExtName} - (副本)${newFile.isFolder ? '' : '.' + newFile.extension}`
-                        }
-                    }
-                    currentDirFiles.push(newFile)
-                }
+                const { paste } = usePathStore()
+                paste()
             }
         })
         return this
     }
 
 
-    /**
-     * 构建菜单
-     * @returns {ContentMenuItem[]}
-     */
-    build(): ContentMenuItem[] {
-        return this.items
+    build(): Array<ContentMenuItem> {
+        return cloneDeep(this.items)
     }
 }

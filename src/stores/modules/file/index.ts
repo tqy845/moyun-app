@@ -2,6 +2,7 @@ import {  MoYunModeEnum } from '@/constants'
 import { defineStore } from 'pinia'
 import { postNewFolder } from '@/api/dir.ts'
 import { usePathStore } from '@/stores'
+import Folder from '@/models/File/Folder'
 
 export enum UploadEventFromEnum {
   outside = 'outside',

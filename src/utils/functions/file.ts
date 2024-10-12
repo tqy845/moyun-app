@@ -6,6 +6,7 @@ import { FileRawModel } from '@/api/models/fileModel'
 import fileClass from '@/assets/fileClass.json'
 import { fileUtils, videoUtils, imageUtils } from '@/utils/functions'
 import { ContextMenu } from '@/models/ContextMenu'
+import { usePathStore } from '@/stores'
 
 export default {
   isFile(file: FileRawModel | MYFile | Folder) {
@@ -92,6 +93,15 @@ export default {
       return videoUtils.videoThumbnail(file, 'webp', maxWidth, maxHeight)
     }
     return Promise.reject('')
+  },
+  generateNewName(baseName: string, file: MYFile | Folder) {
+    const { currentDirFiles } = usePathStore()
+    let newName = `${baseName}${file.isFolder ? '' : '.' + file.extension}`;
+    let count = 2;
+    while (currentDirFiles.find(_file => _file.name === newName && _file.__prototype__.type === file.__prototype__.type)) {
+      newName = `${baseName}(${count++})${file.isFolder ? '' : '.' + file.extension}`;
+    }
+    return newName
   },
   dataURLtoBlob(dataURL: string): Promise<Blob> {
     return new Promise((resolve) => {

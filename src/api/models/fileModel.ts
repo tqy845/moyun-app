@@ -70,3 +70,9 @@ export interface DownloadURLModel {
   Fragment: string
   RawFragment: string
 }
+
+
+export interface FileCopyOptionModel {
+  newName: string
+  targetDirId: number
+}

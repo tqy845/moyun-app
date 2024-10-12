@@ -2,7 +2,7 @@ import { request } from '@/utils/request'
 import MYFile from '@/models/File/File'
 import {
   BuildFileDownModel,
-  BuildFileUploadResultModel, FileChunkDownloadModel, FileChunkUploaded, FileRawModel
+  BuildFileUploadResultModel, FileChunkDownloadModel, FileChunkUploaded, FileCopyOptionModel, FileRawModel
 } from './models/fileModel'
 import Base from '@/models/File/Base'
 import { FetchResponse } from '@/utils/request/utils.ts'
@@ -26,7 +26,9 @@ const Api = {
   GetChunkDownload: `/file/chunk/download`,
   PostPreviewUrl: `/file/preview`,
   RenameFileName: (fileId: number) => `/file/${fileId}/file/name`,
-  RemoveFile: (fileId: number) => `/file/${fileId}/file`
+  RemoveFile: (fileId: number) => `/file/${fileId}/file`,
+  CopyFile: (fileId: number) => `/file/${fileId}/file/copy`,
+  CutFile: (fileId: number) => `/file/${fileId}/file/cut`,
 }
 
 export const getById = <T>(id: number) => {
@@ -176,7 +178,26 @@ export const uploadFileChunk = (formData: FormData, url: string) => {
   )
 }
 
-export function putRenameFileName(fileId: number, body: { name: string }) {
+export const postCopyFile = (fileId: number, options: FileCopyOptionModel) => {
+  return request.post<FetchResponse<any>>(Api.CopyFile(fileId), {
+    body: options
+  }, {
+    isTransformResponse: false
+  })
+}
+
+export const postCutFile = (fileId: number, targetDirId: number) => {
+  return request.post<FetchResponse<any>>(Api.CutFile(fileId), {
+    body: {
+      targetDirId
+    }
+  }, {
+    isTransformResponse: false
+  })
+}
+
+
+export const putRenameFileName = (fileId: number, body: { name: string }) => {
   return request.put<FetchResponse<any>>(Api.RenameFileName(fileId), {
     body
   }, {
@@ -184,7 +205,7 @@ export function putRenameFileName(fileId: number, body: { name: string }) {
   })
 }
 
-export function putRemoveFile(fileId: number) {
+export const putRemoveFile = (fileId: number) => {
   return request.put<FetchResponse<any>>(Api.RemoveFile(fileId), {}, {
     isTransformResponse: false
   })

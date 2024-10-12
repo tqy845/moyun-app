@@ -5,6 +5,9 @@ import File from '@/models/File/File'
 import { fileUtils } from '@/utils/functions'
 import { useDirStore, useFileMapStore, useSettingStore } from '@/stores'
 import Base from '@/models/File/Base.ts'
+import { cloneDeep } from 'lodash'
+import { postCopyFile, postCutFile } from '@/api/file'
+import { postCopyFolder, postCutFolder } from '@/api/dir'
 
 export type AggregateFile = (File & any) | (Folder & any)
 
@@ -80,6 +83,13 @@ export const usePathStore = defineStore(
       // 清空历史路径
       peekDirArray.value.length = 0
     }
+
+    /**
+     *  排序
+     * 
+     * @param type - 排序类型，默认为文件夹在前
+     * @param mode - 排序模式，默认为升序
+     */
     const sort = (
       type: SortTypeEnum = fileSortType.value,
       mode: SortModeEnum = fileSortMode.value
@@ -87,6 +97,55 @@ export const usePathStore = defineStore(
       currentDirFiles.value.sort(fileUtils.compareByAttr(type, mode))
       fileSortType.value = type
       fileSortMode.value = mode
+    }
+
+    /**
+     * 粘贴文件
+     */
+    const paste = async () => {
+      console.log(currentActionFiles.value);
+      for (let i = 0; i < currentActionFiles.value.length; i++) {
+        const file = currentActionFiles.value[i]
+        const newFile = cloneDeep(file)
+        const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.__prototype__.type === file.__prototype__.type)
+        if (file.isCutting) {
+          file.isCutting = false
+          if (oldFile) {
+            const confirmDia = DialogPlugin({
+              header: '源文件名和目标文件名相同',
+              body: `文件名：${file.name}\n\n项目类型：${file.extension}\n${file.size}`,
+              confirmBtn: '确认',
+              cancelBtn: null,
+              onConfirm: () => {
+                confirmDia.hide()
+              },
+            })
+            continue
+          }
+          const fn = file.isFolder ? postCutFolder : postCutFile
+          fn(file.id, currentDir.value.id)
+        }
+        if (file.isCopying) {
+          // file.isCopying = false
+          const targetDirId = currentDir.value.id
+          // 在当前目录下是否存在同名文件
+          if (oldFile) {
+            const baseName = `${newFile.notExtName} - 副本`;
+            // xxx - 副本，xxx - 副本(2)，xxx - 副本(3) ...
+            newFile.name = fileUtils.generateNewName(baseName, newFile)
+            newFile.parentId = targetDirId
+          }
+          const fn = file.isFolder ? postCopyFolder : postCopyFile
+          const { fail, data } = await fn(file.id, {
+            newName: newFile.name,
+            targetDirId,
+          })
+          if (!fail) {
+            newFile.id = data.id
+          }
+        }
+        currentDirFiles.value.push(newFile)
+      }
     }
 
     // 监听 path.children 的变化并触发异步加载当前目录下的文件
@@ -123,7 +182,8 @@ export const usePathStore = defineStore(
       reverseSelected,
       back,
       forward,
-      sort
+      sort,
+      paste
     }
   },
   {

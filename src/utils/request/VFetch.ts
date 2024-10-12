@@ -1,4 +1,4 @@
-import { fetch } from '@tauri-apps/plugin-http'
+// import { fetch } from '@tauri-apps/plugin-http'
 import cloneDeep from 'lodash/cloneDeep'
 import debounce from 'lodash/debounce'
 import isFunction from 'lodash/isFunction'
@@ -243,9 +243,15 @@ export class VFetch {
       // 发起请求
       fetch(conf.url, { headers, ...conf })
         .then(async (response) => {
+          // 判断是否为 204 No Content
+          if (response.status === 204) {
+            // 204 没有内容，直接返回空值或处理成功状态
+            resolve(response as unknown as T)
+            return 
+          }
           // 调用响应拦截器
           if (responseInterceptors && isFunction(responseInterceptors)) {
-            response = await responseInterceptors(response,notify)
+            response = await responseInterceptors(response, notify)
           }
           const responseData: Result = await response.json()
           if (transformRequestHook && isFunction(transformRequestHook)) {

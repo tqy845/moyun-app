@@ -1,6 +1,6 @@
 import { request } from '@/utils/request'
 import { FileRawModel } from '@/api/models/fileModel'
-import { QueryDirectoryModel, AsideMenuModel } from '@/api/models/dirModel'
+import { QueryDirectoryModel, AsideMenuModel, FolderCopyOptionModel } from '@/api/models/dirModel'
 import { FetchResponse } from '@/utils/request/utils.ts'
 
 const Api = {
@@ -8,12 +8,14 @@ const Api = {
   AsideMenu: `/dir/menu/aside/list`,
   QuickById: (id: number) => `/dir/${id}/quick`,
   RenameFolderName: (folderId: number) => `/dir/${folderId}/folder/name`,
+  CopyFolder: (folderId: number) => `/dir/${folderId}/folder/copy`,
+  CutFolder: (folderId: number) => `/dir/${folderId}/folder/cut`,
   RemoveFolder: (folderId: number) => `/dir/${folderId}/folder`,
   Remove: (id: number) => `/dir/${id}`,
   GetById: (id: number) => `/dir/${id}`,
   GetFileList: (id: number) => `/dir/${id}`,
   GetDirList: (id: number) => `/dir/${id}/list`,
-  GetPhotoList: (id: number) => `/dir/photo/${id}/list`
+  GetPhotoList: (id: number) => `/dir/photo/${id}/list`,
 }
 
 export function getAsideMenu() {
@@ -43,6 +45,25 @@ export const getDirList = (dirId: number, params: QueryDirectoryModel) => {
     params
   })
 }
+
+export const postCopyFolder = (folderId: number, options: FolderCopyOptionModel) => {
+  return request.post<FetchResponse<any>>(Api.CopyFolder(folderId), {
+    body: options
+  }, {
+    isTransformResponse: false
+  })
+}
+
+export const postCutFolder = (folderId: number, targetDirId: number) => {
+  return request.post<FetchResponse<any>>(Api.CutFolder(folderId), {
+    body: {
+      targetDirId
+    }
+  }, {
+    isTransformResponse: false
+  })
+}
+
 
 export function getById<T>(id: number) {
   return request.get<T>(Api.GetById(id), {})
