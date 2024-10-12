@@ -27,7 +27,6 @@ interface InternalFetchRequestConfig extends RequestInit {
  * Fetch 模块
  */
 export class VFetch {
-  readonly fetchCanceler = FetchCanceler
   /**
    * Fetch配置
    * @private
@@ -240,35 +239,15 @@ export class VFetch {
     }, 1000)
 
     return new Promise<T>((resolve, reject) => {
-      this.fetchCanceler.addPending(conf)
+      FetchCanceler.addPending(conf)
       // 发起请求
       fetch(conf.url, { headers, ...conf })
         .then(async (response) => {
-          // 判断是否为 204 No Content
-          if (response.status === 204) {
-            // 204 没有内容，直接返回空值或处理成功状态
-            resolve(null as unknown as T)
-            return
-          }
-          const responseData: Result = await response.json()
-
-          // 检查 HTTP 状态码
-          if ((!response.ok && !Reflect.has(responseData, 'message')) || response.status === 401) {
-            const errorMessage = getErrorMessage(response.status)
-            notify(errorMessage)
-            if (response.status !== 401) {
-              throw new Error(errorMessage)
-            } else {
-              // 终止所有正在发起的请求
-              this.fetchCanceler.removeAllPending()
-            }
-          }
-
           // 调用响应拦截器
           if (responseInterceptors && isFunction(responseInterceptors)) {
-            response = await responseInterceptors(response)
+            response = await responseInterceptors(response,notify)
           }
-
+          const responseData: Result = await response.json()
           if (transformRequestHook && isFunction(transformRequestHook)) {
             const ret = await transformRequestHook(
               { config: conf, response, responseData, notify },
@@ -277,11 +256,9 @@ export class VFetch {
             resolve(ret)
             return
           }
-
           resolve(responseData as unknown as T)
         })
         .catch((e) => {
-          // 捕获所有的错误，包括网络错误
           let errorMessage = ERROR_MESSAGES.unknownError // 默认未知错误
 
           if (e.name === 'AbortError') {
@@ -305,7 +282,7 @@ export class VFetch {
           reject(e)
         })
         .finally(() => {
-          this.fetchCanceler.removePending(conf)
+          FetchCanceler.removePending(conf)
         })
     })
   }

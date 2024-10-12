@@ -25,6 +25,7 @@ export const getErrorMessage = (status: number): string => {
       return ERROR_MESSAGES.serverError
     case 502:
     case 503:
+      return ERROR_MESSAGES.networkError
     case 504:
       return ERROR_MESSAGES.gatewayError
     default:

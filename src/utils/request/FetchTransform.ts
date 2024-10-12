@@ -58,7 +58,7 @@ export abstract class FetchTransform {
   /**
    * 响应拦截器
    */
-  responseInterceptors?: (res: Response) => Promise<Response>
+  responseInterceptors?: (res: Response, notify: Function) => Promise<Response>
 
   /**
    * 请求拦截器错误处理

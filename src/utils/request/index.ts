@@ -7,6 +7,8 @@ import { useUserStore } from '@/stores'
 import { VFetch } from './VFetch'
 import type { CreateFetchOptions, FetchTransform } from './FetchTransform'
 import { formatRequestDate, joinTimestamp, setObjToUrlParams } from './utils'
+import { getErrorMessage } from './error'
+import FetchCanceler from './FetchCancel'
 
 const host = import.meta.env.VITE_APP_BASE_API
 const successStyle = 'background: #2ba471;color:white; font-weight: bold;padding:2px'
@@ -131,8 +133,26 @@ const transform: FetchTransform = {
   },
 
   //响应拦截器处理
-  responseInterceptors: async (res): Promise<Response> => {
-    return res
+  responseInterceptors: async (response, notify): Promise<Response> => {
+    // 判断是否为 204 No Content
+    if (response.status === 204) {
+      // 204 没有内容，直接返回空值或处理成功状态
+      return response
+    }
+    console.log('response', response.status, response.statusText, response.ok);
+
+    // 检查 HTTP 状态码
+    if (!response.ok || response.status === 401) {
+      const errorMessage = getErrorMessage(response.status)
+      notify(errorMessage)
+      if (response.status !== 401) {
+        throw new Error(errorMessage)
+      } else {
+        // 终止所有正在发起的请求
+        FetchCanceler.removeAllPending()
+      }
+    }
+    return response
   },
 
   // 响应错误处理
