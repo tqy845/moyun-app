@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0",
-  "productName": "tauri-v2-001",
+  "productName": "摸云",
   "version": "0.1.0",
-  "identifier": "com.tauri-v2-001.app",
+  "identifier": "com.moyun.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
