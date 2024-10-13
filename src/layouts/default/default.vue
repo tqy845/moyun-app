@@ -51,6 +51,7 @@ onMounted(executed)
 
 // 监听setting变化
 settingStore.$subscribe(settingUpdate)
+
 </script>
 <template>
   <t-layout
@@ -60,6 +61,7 @@ settingStore.$subscribe(settingUpdate)
     @dragleave="dragleaveEvent"
     @dragover="dragoverEvent"
     @drop="dropEvent"
+
   >
     <t-header class="!bg-transparent" height="auto" style="">
       <TheHeader />
@@ -69,11 +71,13 @@ settingStore.$subscribe(settingUpdate)
         <TheAside class="border-r-1 border-r-solid border-r-[#f2f5f5]" />
       </t-aside>
       <t-content id="m-main" ref="contentRef" class="overflow-y-auto overflow-x-hidden bg-white">
+        <!-- 主视图： -->
         <RouterView v-slot="{ Component }">
           <KeepAlive>
             <component :is="Component" />
           </KeepAlive>
         </RouterView>
+        <!-- 其他组件： -->
         <!-- 上传组件 -->
         <BtnUpload :visible="_isShowUploadArea" @close="hideUploadArea" />
         <!-- 预览组件-->
@@ -81,6 +85,7 @@ settingStore.$subscribe(settingUpdate)
         <TheProfile :visible="userStore.profile" @close="userStore.profile = false" />
         <!--  选择文件夹组件-->
         <TheSelectFolder />
+   
       </t-content>
     </t-layout>
   </t-layout>

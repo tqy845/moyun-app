@@ -30,6 +30,8 @@ export const usePathStore = defineStore(
       return currentDirSelectedFiles.value.includes(file)
     }
     const clearSelected = () => {
+      console.log("触发");
+      
       currentDirSelectedFiles.value.length = 0
     }
     const addSelected = (...file: Array<File | Folder>) => {
@@ -111,8 +113,8 @@ export const usePathStore = defineStore(
         const newFile = cloneDeep(file);
         newFile.isCutting = false;
         newFile.isCopying = false;
-        
-        const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.type === file.type); 
+
+        const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.type === file.type);
 
         // 剪切操作
         if (file.isCutting) {

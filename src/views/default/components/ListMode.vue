@@ -73,9 +73,10 @@ const eventLeftClick = (file: File | Folder) => {
     // 确保 startIndex <= endIndex
     startIndex > endIndex ? ([endIndex, startIndex] = [startIndex, endIndex]) : null
     // 切片
-    const patchSelectedArray = currentDirFiles.value.slice(startIndex, endIndex + 1) as unknown as Array<
-      File | Folder
-    >
+    const patchSelectedArray = currentDirFiles.value.slice(
+      startIndex,
+      endIndex + 1
+    ) as unknown as Array<File | Folder>
     addSelected(...patchSelectedArray)
   }
 }
@@ -121,18 +122,42 @@ const eventUpdateSelected = (
 <template>
   <div v-if="currentDirFiles.length">
     <TheContextMenu :menu="selectedFile?.menuItems" @select="$event.action(selectedFile)">
-      <t-table class="!bg-transparent" ref="tableRef" row-key="name" :columns="columns" :data="currentDirFiles"
-        :height="systemStore.contentHeight" :scroll="{ type: 'virtual', rowHeight: 48, bufferSize: 10 }"
-        :bordered="false" lazy-load drag-sort="col" size="small" table-layout="fixed" resizable hover
-        select-on-row-click :selected-row-keys="selectedRowKeys" :activeRowKeys="selectedRowKeys"
-        :active-row-type="'single'" @click.stop @row-mouseup="eventRowClick" @row-dblclick="eventRowDblclick"
-        @active-change="eventUpdateSelected">
+      <t-table
+        class="!bg-transparent"
+        ref="tableRef"
+        row-key="name"
+        :columns="columns"
+        :data="currentDirFiles"
+        :height="systemStore.contentHeight"
+        :scroll="{ type: 'virtual', rowHeight: 48, bufferSize: 10 }"
+        :bordered="false"
+        lazy-load
+        drag-sort="col"
+        size="small"
+        table-layout="fixed"
+        resizable
+        hover
+        select-on-row-click
+        :selected-row-keys="selectedRowKeys"
+        :activeRowKeys="selectedRowKeys"
+        :active-row-type="'single'"
+        @click.stop
+        @row-mouseup="eventRowClick"
+        @row-dblclick="eventRowDblclick"
+        @active-change="eventUpdateSelected"
+      >
         <template #name="{ col, row }">
           <!-- 标题加上图标 -->
           <div class="overflow-hidden text-ellipsis">
-            <TheIcon class="mr-2 mb-1 w-[50px]" shape="round" :external="true"
-              :filename="fileUtils.isThumbnailType(row['extension']) ? row['hash'] : ''" :name="row['icon']" size="30"
-              :width="30" />
+            <TheIcon
+              class="mr-2 mb-1 w-[50px]"
+              shape="round"
+              :external="true"
+              :filename="fileUtils.isThumbnailType(row['extension']) ? row['hash'] : ''"
+              :name="row['icon']"
+              size="30"
+              :width="30"
+            />
             <span class="">{{ row[col.colKey] }}</span>
           </div>
         </template>

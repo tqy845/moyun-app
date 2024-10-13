@@ -8,11 +8,14 @@ import { ContentMenuItem, MoYunModeEnum } from '@/constants'
 import TheContextMenu from '@/components/TheContextMenu.vue'
 import { resetMode } from '@/stores/modules/file/helper'
 import { ContextMenu } from '@/models/ContextMenu'
+import { cloneDeep } from 'lodash'
 
 const containerRef = ref<HTMLElement>()
 
 const { clearSelected } = usePathStore()
-const { currentDir, currentActionFiles } = storeToRefs(usePathStore())
+const { currentDir, currentActionFiles, currentDirFiles, currentDirSelectedFiles } =
+  storeToRefs(usePathStore())
+
 const controlState = useKeyModifier('Control')
 const { isOutside } = useMouseInElement(containerRef)
 const { focused } = useFocus(containerRef)
@@ -22,6 +25,15 @@ const settingStore = useSettingStore()
 
 // 返回当前内容布局模式
 const currentMode = computed(() => (mode.value !== MoYunModeEnum.LIST ? IconMode : ListMode))
+
+// 拖拽事件
+let fileSelectorWorker: Worker
+let isDragging = ref(false)
+let isDrag = ref(false)
+let dragStartX = ref(0)
+let dragStartY = ref(0)
+let dragSelectionBox = ref({ top: 0, left: 0, width: 0, height: 0 })
+let animationFrameId: number | null = null
 
 /**
  * 绑定鼠标滚动实现修改Mode
@@ -58,15 +70,13 @@ const createMenu = () => {
     .appendNewDocument()
     .build()
 
-
   if (currentActionFiles.value.length) {
     // 处理复制、剪切
-    const copyingArr = currentActionFiles.value.filter(file => file.isCopying)
-    const cutingArr = currentActionFiles.value.filter(file => file.isCutting)
+    const copyingArr = currentActionFiles.value.filter((file) => file.isCopying)
+    const cutingArr = currentActionFiles.value.filter((file) => file.isCutting)
     if (copyingArr.length || cutingArr.length) {
       menus.push(...ContextMenu.builder().appendPaste().build())
     }
-
   }
 
   return menus
@@ -79,13 +89,126 @@ watchEffect(() => {
 })
 
 onMounted(eventResetSize)
-onUpdated(resetMode)
+onUpdated(() => {
+  if (!isDragging.value) {
+    resetMode()
+  }
+})
+
+const eventMousedown = (event: MouseEvent) => {
+  // console.log('按下')
+  fileSelectorWorker = new Worker(new URL('@/workers/fileSelector.js', import.meta.url))
+  fileSelectorWorker.onmessage = (event) => {
+    const selectedFiles = event.data
+    // 更新 selectedFiles 状态
+    // console.log(selectedFiles)
+    currentDirSelectedFiles.value.clear()
+    selectedFiles.forEach(({ id, extension }: { id: number; extension: string }) => {
+      currentDirSelectedFiles.value.push(
+        currentDirFiles.value.find((file) => file.id === id && file.extension === extension)
+      )
+    })
+  }
+  isDragging.value = true
+  dragStartX.value = event.clientX
+  dragStartY.value = event.clientY
+  dragSelectionBox.value = { top: dragStartY.value, left: dragStartX.value, width: 0, height: 0 }
+}
+
+const eventMouseup = () => {
+  // console.log('松开')
+  if (isDragging.value) {
+    dragSelectionBox.value = { top: 0, left: 0, width: 0, height: 0 }
+  }
+  isDragging.value = false
+  fileSelectorWorker.terminate()
+}
+
+const eventMousemove = (event: MouseEvent) => {
+  // console.log('移动')
+  if (isDragging.value) {
+    const deltaX = Math.abs(event.clientX - dragStartX.value)
+    const deltaY = Math.abs(event.clientY - dragStartY.value)
+
+    if (deltaX > 3 || deltaY > 3) {
+      // 例如设定为移动超过3像素才算拖拽
+      isDrag.value = true
+    }
+    const currentX = event.clientX
+    const currentY = event.clientY
+
+    const width = Math.abs(currentX - dragStartX.value)
+    const height = Math.abs(currentY - dragStartY.value)
+    const left = Math.min(currentX, dragStartX.value)
+    const top = Math.min(currentY, dragStartY.value)
+
+    dragSelectionBox.value = { top, left, width, height }
+
+    // 销毁上一次的动画帧，确保只执行最新的
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
+    }
+
+    // 使用 requestAnimationFrame 调用 selectFilesInArea
+    animationFrameId = requestAnimationFrame(() => {
+      selectFilesInArea()
+    })
+  }
+}
+
+// 选择拖拽区域内的文件
+const selectFilesInArea = () => {
+  if (!isDragging.value) {
+    return
+  }
+
+  const selectionBox = cloneDeep(dragSelectionBox.value)
+  const files = currentDirFiles.value.map((file) => ({
+    id: file.id,
+    extension: file.extension,
+    rect: file._ref.$el.getBoundingClientRect()
+  }))
+  fileSelectorWorker.postMessage({ selectionBox, files })
+}
+
+const _clearSelected = () => {
+  if (isDrag.value) {
+    isDrag.value = false
+    return
+  }
+
+  clearSelected()
+}
 </script>
 <template>
-  <div ref="containerRef" class="h-full w-full pa-1 overflow-y-hidden">
+  <div
+    ref="containerRef"
+    class="h-full w-full pa-1 overflow-y-hidden"
+    @mousedown.stop="eventMousedown"
+    @mousemove.stop="eventMousemove"
+    @mouseup.stop="eventMouseup"
+  >
     <TheContextMenu :menu="menu" class="h-full" @select="$event?.action()">
-      <component :is="currentMode" @click="clearSelected()" @contextmenu="clearSelected()" />
+      <component
+        :is="currentMode"
+        @click.stop="_clearSelected"
+        @contextmenu.stop="_clearSelected"
+      />
     </TheContextMenu>
+
+    <!-- 拖拽选取框 -->
+    <div
+      v-if="isDragging"
+      class="pos-absolute pointer-events-none"
+      :style="{
+        top: dragSelectionBox.top + 'px',
+        left: dragSelectionBox.left + 'px',
+        width: dragSelectionBox.width + 'px',
+        height: dragSelectionBox.height + 'px',
+        backgroundColor: 'rgba(0, 123, 255, 0.2)',
+        border: '1px solid #007bff',
+      }"
+    ></div>
   </div>
 </template>
 

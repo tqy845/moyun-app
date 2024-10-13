@@ -25,7 +25,8 @@ export default class Base {
   public isRenaming = ref(false)
   // 进度条
   public progress = ref(0)
-
+  // 绑定元素
+  public _ref: Element | ComponentPublicInstance | null = null
   /**
    * 构造方法
    */

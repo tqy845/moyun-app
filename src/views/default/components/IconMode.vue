@@ -36,6 +36,7 @@ fileStore.$subscribe(async ({ type }: { type: string }) => {
   }
 })
 </script>
+
 <template>
   <div
     v-if="dirFiles.length"
@@ -54,4 +55,6 @@ fileStore.$subscribe(async ({ type }: { type: string }) => {
   <TheEmpty v-else :empty="dirFiles.length === 0" :loading="isLoading" />
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+/* 样式代码 */
+</style>
