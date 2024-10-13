@@ -44,6 +44,10 @@ export default class Base {
     return Object.is(this.extension, FileExtensionEnum.FOLDER)
   }
 
+  get typeName() {
+    return this.isFolder ? '文件夹' : `${this.extension} 文件`
+  }
+
   /**
    * 判断是否拥有flag
    * @param flag FlagEnum

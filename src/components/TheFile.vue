@@ -93,7 +93,7 @@ onUpdated(updated)
       <template #content>
         <div class="w-40">
           <t-row><span class="text-small">名称：</span>{{ file.name }}</t-row>
-          <t-row><span class="text-small">类型：</span>{{ file.extension === 'folder' ? "文件夹" : `${file.extension} 文件` }}</t-row>
+          <t-row><span class="text-small">类型：</span>{{ file.typeName }}</t-row>
           <t-row><span class="text-small font-bold">大小：</span>{{ fileUtils.formatFileSize(file.size || 0) }}
           </t-row>
           <t-row><span class="text-small font-bold">修改日期：</span>{{ useDateFormat(file.updatedAt, 'YYYY-MM-DD HH:mm:ss')
