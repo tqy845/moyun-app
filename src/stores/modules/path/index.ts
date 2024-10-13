@@ -103,17 +103,20 @@ export const usePathStore = defineStore(
      * 粘贴文件
      */
     const paste = async () => {
-      console.log(currentActionFiles.value);
-      let isCutAction = false
-      for (let i = 0; i < currentActionFiles.value.length; i++) {
-        const file = currentActionFiles.value[i]
-        const newFile = cloneDeep(file)
-        newFile.isCutting = false
-        newFile.isCopying = false
+      const promises = [];
+      let isCutAction = false;
 
-        const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.__prototype__.type === file.__prototype__.type)
+      for (let i = 0; i < currentActionFiles.value.length; i++) {
+        const file = currentActionFiles.value[i];
+        const newFile = cloneDeep(file);
+        newFile.isCutting = false;
+        newFile.isCopying = false;
+        
+        const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.type === file.type); 
+
+        // 剪切操作
         if (file.isCutting) {
-          isCutAction = true
+          isCutAction = true;
           if (oldFile) {
             const confirmDia = DialogPlugin({
               header: '源文件名和目标文件名相同',
@@ -121,37 +124,43 @@ export const usePathStore = defineStore(
               confirmBtn: '确认',
               cancelBtn: null,
               onConfirm: () => {
-                confirmDia.hide()
+                confirmDia.hide();
               },
-            })
-            file.isCutting = false // 还原
-            continue
+            });
+            continue; // 文件重名时跳过操作，避免继续执行
           }
-          const fn = file.isFolder ? postCutFolder : postCutFile
-          await fn(file.id, currentDir.value.id)
+
+          const fn = file.isFolder ? postCutFolder : postCutFile;
+          promises.push(fn(file.id, currentDir.value.id)); // 收集异步操作
         }
+
+        // 复制操作
         if (file.isCopying) {
-          // file.isCopying = false
-          const targetDirId = currentDir.value.id
-          // 在当前目录下是否存在同名文件
+          const targetDirId = currentDir.value.id;
           if (oldFile) {
             const baseName = `${newFile.notExtName} - 副本`;
             // xxx - 副本，xxx - 副本(2)，xxx - 副本(3) ...
-            newFile.name = fileUtils.generateNewName(baseName, newFile)
-            newFile.parentId = targetDirId
+            newFile.name = fileUtils.generateNewName(baseName, newFile);
           }
-          const fn = file.isFolder ? postCopyFolder : postCopyFile
-          const { fail, data } = await fn(file.id, {
-            newName: newFile.name,
-            targetDirId,
-          })
-          if (!fail) {
-            newFile.id = data.id
-          }
+          newFile.parentId = targetDirId;
+
+          const fn = file.isFolder ? postCopyFolder : postCopyFile;
+          const copyPromise = fn(file.id, { newName: newFile.name, targetDirId });
+          promises.push(copyPromise.then(({ fail, data }) => {
+            if (!fail) {
+              newFile.id = data.id;
+            }
+          }));
+
+          // 将新文件添加到当前目录文件列表
+          currentDirFiles.value.push(newFile);
         }
-        currentDirFiles.value.push(newFile)
       }
-      // 剪切操作需要清空粘贴文件
+
+      // 等待所有异步操作完成
+      await Promise.all(promises);
+
+      // 如果有剪切操作，清空粘贴文件
       if (isCutAction) {
         currentActionFiles.value.clear()
       }
