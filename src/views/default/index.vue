@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import { mouseUtils } from '@/utils/functions'
 import { MOUSE_DIRECTION } from '@/utils/functions/mouse-functions'
-import { useFileStore, useSettingStore, usePathStore } from '@/stores'
+import {
+  useFileStore,
+  useSettingStore,
+  usePathStore,
+  useDirStore,
+  useFileRectMapStore
+} from '@/stores'
 import IconMode from './components/IconMode.vue'
 import ListMode from './components/ListMode.vue'
 import { ContentMenuItem, MoYunModeEnum } from '@/constants'
@@ -11,11 +17,11 @@ import { ContextMenu } from '@/models/ContextMenu'
 import { cloneDeep } from 'lodash'
 
 const containerRef = ref<HTMLElement>()
-
+const { calcNewData, getItemById } = useFileRectMapStore()
 const { clearSelected } = usePathStore()
 const { currentDir, currentActionFiles, currentDirFiles, currentDirSelectedFiles } =
   storeToRefs(usePathStore())
-
+const { isDrag } = storeToRefs(useDirStore())
 const controlState = useKeyModifier('Control')
 const { isOutside } = useMouseInElement(containerRef)
 const { focused } = useFocus(containerRef)
@@ -28,11 +34,10 @@ const currentMode = computed(() => (mode.value !== MoYunModeEnum.LIST ? IconMode
 
 // 拖拽事件
 let fileSelectorWorker: Worker
-let isDragging = ref(false)
-let isDrag = ref(false)
-let dragStartX = ref(0)
-let dragStartY = ref(0)
-let dragSelectionBox = ref({ top: 0, left: 0, width: 0, height: 0 })
+const isDragging = ref(false)
+const dragStartX = ref(0)
+const dragStartY = ref(0)
+const dragSelectionBox = ref({ top: 0, left: 0, width: 0, height: 0 })
 let animationFrameId: number | null = null
 
 /**
@@ -89,19 +94,17 @@ watchEffect(() => {
 })
 
 onMounted(eventResetSize)
-onUpdated(() => {
-  if (!isDragging.value) {
-    resetMode()
-  }
-})
+// onUpdated(() => {
+//     resetMode()
+// })
 
-const eventMousedown = (event: MouseEvent) => {
-  // console.log('按下')
+const createWorker = () => {
   fileSelectorWorker = new Worker(new URL('@/workers/fileSelector.js', import.meta.url))
   fileSelectorWorker.onmessage = (event) => {
     const selectedFiles = event.data
     // 更新 selectedFiles 状态
     // console.log(selectedFiles)
+    console.log(3)
     currentDirSelectedFiles.value.clear()
     selectedFiles.forEach(({ id, extension }: { id: number; extension: string }) => {
       currentDirSelectedFiles.value.push(
@@ -109,6 +112,10 @@ const eventMousedown = (event: MouseEvent) => {
       )
     })
   }
+}
+
+const eventMousedown = (event: MouseEvent) => {
+  console.log('按下')
   isDragging.value = true
   dragStartX.value = event.clientX
   dragStartY.value = event.clientY
@@ -116,24 +123,21 @@ const eventMousedown = (event: MouseEvent) => {
 }
 
 const eventMouseup = () => {
-  // console.log('松开')
+  console.log('松开')
   if (isDragging.value) {
     dragSelectionBox.value = { top: 0, left: 0, width: 0, height: 0 }
   }
   isDragging.value = false
-  fileSelectorWorker.terminate()
+  fileSelectorWorker?.terminate?.()
 }
 
 const eventMousemove = (event: MouseEvent) => {
-  // console.log('移动')
-  if (isDragging.value) {
-    const deltaX = Math.abs(event.clientX - dragStartX.value)
-    const deltaY = Math.abs(event.clientY - dragStartY.value)
+  console.log('移动')
+  const deltaX = Math.abs(event.clientX - dragStartX.value)
+  const deltaY = Math.abs(event.clientY - dragStartY.value)
 
-    if (deltaX > 3 || deltaY > 3) {
-      // 例如设定为移动超过3像素才算拖拽
-      isDrag.value = true
-    }
+  if ((isDragging.value && deltaX > 3) || deltaY > 3) {
+    isDrag.value = true
     const currentX = event.clientX
     const currentY = event.clientY
 
@@ -141,18 +145,19 @@ const eventMousemove = (event: MouseEvent) => {
     const height = Math.abs(currentY - dragStartY.value)
     const left = Math.min(currentX, dragStartX.value)
     const top = Math.min(currentY, dragStartY.value)
+    console.log(0)
 
     dragSelectionBox.value = { top, left, width, height }
 
     // 销毁上一次的动画帧，确保只执行最新的
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId)
-    }
+    // if (animationFrameId) {
+      // cancelAnimationFrame(animationFrameId)
+    // }
 
     // 使用 requestAnimationFrame 调用 selectFilesInArea
-    animationFrameId = requestAnimationFrame(() => {
+    // animationFrameId = requestAnimationFrame(() => {
       selectFilesInArea()
-    })
+    // })
   }
 }
 
@@ -161,13 +166,20 @@ const selectFilesInArea = () => {
   if (!isDragging.value) {
     return
   }
+  fileSelectorWorker?.terminate?.()
+  createWorker()
+  console.log(1)
 
   const selectionBox = cloneDeep(dragSelectionBox.value)
   const files = currentDirFiles.value.map((file) => ({
     id: file.id,
     extension: file.extension,
-    rect: file._ref.$el.getBoundingClientRect()
+    // rect: document.querySelector(`[data-id='${file.id}']`)?.getBoundingClientRect() // 使用缓存的矩形信息
+    rect: getItemById(file.id) // 使用缓存的矩形信息
   }))
+  console.log(2)
+
+  console.log(files)
   fileSelectorWorker.postMessage({ selectionBox, files })
 }
 
@@ -179,6 +191,8 @@ const _clearSelected = () => {
 
   clearSelected()
 }
+
+onMounted(calcNewData)
 </script>
 <template>
   <div
@@ -206,7 +220,7 @@ const _clearSelected = () => {
         width: dragSelectionBox.width + 'px',
         height: dragSelectionBox.height + 'px',
         backgroundColor: 'rgba(0, 123, 255, 0.2)',
-        border: '1px solid #007bff',
+        border: '1px solid #007bff'
       }"
     ></div>
   </div>

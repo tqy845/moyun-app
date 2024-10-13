@@ -90,7 +90,9 @@ onUpdated(updated)
     class="card m-1 cursor-pointer flex justify-center text-center bg-transparent"
     @click="eventSelected"
     @contextmenu="eventContextmenu"
-    :ref="(ref) => (file._ref = ref)"
+    :data-id="file.id"
+    style="content-visibility: auto"
+    ref="fileRef"
   >
     <t-popup :delay="[1300, 0]" placement="bottom-left" showArrow>
       <!-- 扩展提示 -->

@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { useFileStore, useSettingStore, useSystemStore, usePathStore, useDirStore } from '@/stores'
+import {
+  useFileStore,
+  useSettingStore,
+  useSystemStore,
+  usePathStore,
+  useDirStore,
+} from '@/stores'
 import File from '@/models/File/File'
 import Folder from '@/models/File/Folder'
 import { useTemplateRef } from 'vue'
@@ -7,7 +13,6 @@ import AppBaseLayout from '@/views/default/components/AppBaseLayout.vue'
 import AppFallsLayout from '@/views/default/components/AppFallsLayout.vue'
 
 const iconModeRef = useTemplateRef('iconModeRef')
-
 const systemStore = useSystemStore()
 const fileStore = useFileStore()
 const settingStore = useSettingStore()
@@ -35,6 +40,7 @@ fileStore.$subscribe(async ({ type }: { type: string }) => {
     iconModeRef.value.scrollTop = iconModeRef.value?.scrollHeight
   }
 })
+
 </script>
 
 <template>

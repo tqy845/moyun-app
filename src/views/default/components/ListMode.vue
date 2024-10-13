@@ -1,12 +1,18 @@
 <script lang="ts" setup>
-import { useFileStore, useSystemStore, usePathStore } from '@/stores'
+import { useFileStore, useSystemStore, usePathStore, useDirStore } from '@/stores'
 import File from '@/models/File/File'
 import Folder from '@/models/File/Folder'
-import { ActiveChangeContext, RowEventContext, TableProps, TableRowData } from 'tdesign-vue-next'
+import {
+  ActiveChangeContext,
+  RowEventContext,
+  TableProps,
+  TableRowAttributes,
+  TableRowData
+} from 'tdesign-vue-next'
 import { fileUtils } from '@/utils/functions'
 
 const tableRef = ref()
-
+const { isDrag } = storeToRefs(useDirStore())
 const systemStore = useSystemStore()
 const fileStore = useFileStore()
 const { isSelected, removeSelected, clearSelected, addSelected } = usePathStore()
@@ -87,8 +93,12 @@ const eventRightClick = (file: File | Folder) => {
 }
 
 const eventRowClick = ({ e, row }: RowEventContext<TableRowData>) => {
-  e.preventDefault()
-  e.stopPropagation()
+  if (isDrag.value) {
+    isDrag.value = false
+    return
+  }
+  // e.preventDefault()
+  // e.stopPropagation()
 
   const file = row as unknown as File | Folder
   selectedFile.value = file
@@ -117,6 +127,11 @@ const eventUpdateSelected = (
   clearSelected()
   addSelected(...(activeRowList as unknown as Array<File | Folder>))
 }
+
+const eventRowAttributes = (params: TableRowAttributes<TableRowData>) => {
+  const { row } = params as TableRowData
+  return [{ 'data-id': row.id }]
+}
 </script>
 
 <template>
@@ -141,6 +156,7 @@ const eventUpdateSelected = (
         :selected-row-keys="selectedRowKeys"
         :activeRowKeys="selectedRowKeys"
         :active-row-type="'single'"
+        :row-attributes="eventRowAttributes"
         @click.stop
         @row-mouseup="eventRowClick"
         @row-dblclick="eventRowDblclick"

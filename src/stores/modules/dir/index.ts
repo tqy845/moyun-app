@@ -1,4 +1,4 @@
-import { getAsideMenu, getFileList, getPhotoList } from '@/api/dir'
+import { getAsideMenu, getPhotoList } from '@/api/dir'
 import Folder from '@/models/File/Folder'
 import File from '@/models/File/File'
 import { AsideMenuType } from './helper'
@@ -7,7 +7,6 @@ import { useFileMapStore, usePathStore, useSettingStore } from '@/stores'
 import { fileUtils } from '@/utils/functions'
 import { Prototype } from '@/models/File/interface'
 import { FileRawModel } from '@/api/models/fileModel'
-import { name } from 'lodash'
 
 export const useDirStore = defineStore(
   `dirStore`,
@@ -26,6 +25,7 @@ export const useDirStore = defineStore(
     const { photoAlbumParentId } = storeToRefs(useSettingStore())
     const search = ref('')
     const isBaseLayout = computed(() => asideMenuObjectCurrentIndexItem.value.name !== '图库')
+    const isDrag = ref(false)
 
     /**
      * 读取侧边菜单项
@@ -99,6 +99,7 @@ export const useDirStore = defineStore(
       asideMenuObjectCurrentIndexItem,
       isBaseLayout,
       folderSelect,
+      isDrag,
 
       switchFolderSelect,
       readAsideMenu,
