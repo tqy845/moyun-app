@@ -15,7 +15,7 @@ export const usePathStore = defineStore(
   'path-store',
   () => {
     const children = ref<Array<Dir & any>>([])
-    const currentDir = computed(() => children.value.peek())
+    const currentDir = computed<AggregateFile>(() => children.value.peek())
     const historyChildren = ref<Array<number>>([]) // 装入目录的ID
     const isLoading = ref(false)
     const currentDirFiles = ref<Array<AggregateFile>>([])

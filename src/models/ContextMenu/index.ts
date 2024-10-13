@@ -353,7 +353,7 @@ export class ContextMenu {
             color,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
-                currentDirSelectedFiles.forEach(file => file.isRenaming.value = true)
+                currentDirSelectedFiles.forEach(file => file.isRenaming = true)
             }
         })
         return this

@@ -79,6 +79,8 @@ const selectedStyles = computed(() => {
 })
 
 onUpdated(updated)
+
+
 </script>
 
 <template>

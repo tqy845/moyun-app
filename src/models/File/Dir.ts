@@ -60,8 +60,9 @@ export default class Dir {
   /**
    * 追加一个文件到本目录
    * @param fileRawModel 文件元数据
+   * @returns 返回文件实例
    */
-  appendFile = async (fileRawModel: FileRawModel) => {
+  appendFile = async (fileRawModel: FileRawModel, reSort: boolean = true) => {
     const fileMapStore = useFileMapStore()
     const { isLoading, currentDirFiles } = storeToRefs(usePathStore())
     const { sort } = usePathStore()
@@ -71,11 +72,11 @@ export default class Dir {
     // 添加到渲染列表
     currentDirFiles.value.push(fileInstance)
     // 按需排序
-    sort()
+    if (reSort) sort()
     // 缓存到文件哈希表
     fileMapStore.addItem(fileInstance)
     isLoading.value = false
-    return
+    return fileInstance
   }
 
   go = async () => {

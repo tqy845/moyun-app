@@ -40,7 +40,7 @@ export const useUploadStore = defineStore(`upload-store`, () => {
           }
         }
         _formData.append('file', blob, `${hash}.webp`)
-        console.log("hash = ",hash)
+        console.log("hash = ", hash)
         // 上传缩略图
         await uploadThumbnail(_formData, thumbnailUrl)
         resolve(true)
@@ -237,7 +237,7 @@ export const useUploadStore = defineStore(`upload-store`, () => {
       MYFile.status = 'uploaded'
 
       // 实例化元信息，添加到当前目录下
-      await currentDir.appendFile(fileRawModel)
+      await currentDir.appendFile(fileRawModel, false)
     } catch (e) {
       // 出错了
       MYFile.status = 'error'
