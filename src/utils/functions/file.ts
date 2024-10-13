@@ -56,8 +56,8 @@ export default {
     }
   },
   formatFileSize(value: number) {
-    if (null == value) {
-      return '0 Bytes'
+    if (!value) {
+      return '0'
     }
     const unitArr = new Array('Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     let index = 0

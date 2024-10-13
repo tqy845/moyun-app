@@ -36,7 +36,7 @@ const columns = [
     ellipsis: true,
     width: '20vw'
   },
-  { colKey: 'extension', title: '扩展名', ellipsis: true, width: '10vw' },
+  { colKey: 'extension', title: '类型', ellipsis: true, width: '10vw' },
   { colKey: 'size', title: '大小', ellipsis: true, width: '10vw' }
 ]
 
@@ -142,6 +142,14 @@ const eventUpdateSelected = (
           <div class="overflow-hidden text-ellipsis">
             <span class="">{{ new Date(row[col.colKey]).toLocaleString() }}</span>
           </div>
+        </template>
+
+        <template #extension="{ col, row }">
+          <span class="">{{ row[col.colKey] === 'folder' ? "文件夹" : `${row[col.colKey]} 文件` }}</span>
+        </template>
+
+        <template #size="{ col, row }">
+          <span class="">{{ fileUtils.formatFileSize(row[col.colKey]) }}</span>
         </template>
       </t-table>
     </TheContextMenu>
