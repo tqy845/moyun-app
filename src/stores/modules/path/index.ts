@@ -104,14 +104,16 @@ export const usePathStore = defineStore(
      */
     const paste = async () => {
       console.log(currentActionFiles.value);
+      let isCutAction = false
       for (let i = 0; i < currentActionFiles.value.length; i++) {
         const file = currentActionFiles.value[i]
         const newFile = cloneDeep(file)
         newFile.isCutting = false
         newFile.isCopying = false
-        
+
         const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.__prototype__.type === file.__prototype__.type)
         if (file.isCutting) {
+          isCutAction = true
           if (oldFile) {
             const confirmDia = DialogPlugin({
               header: '源文件名和目标文件名相同',
@@ -148,6 +150,10 @@ export const usePathStore = defineStore(
           }
         }
         currentDirFiles.value.push(newFile)
+      }
+      // 剪切操作需要清空粘贴文件
+      if (isCutAction) {
+        currentActionFiles.value.clear()
       }
     }
 
