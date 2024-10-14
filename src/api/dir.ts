@@ -7,6 +7,7 @@ const Api = {
   NewFolder: (parentId: number) => `/dir/${parentId}`,
   AsideMenu: `/dir/menu/aside/list`,
   QuickById: (id: number) => `/dir/${id}/quick`,
+  PutFixedQuickFolder: (folderId: number) => `/dir/${folderId}/folder/fixed/quick`,
   RenameFolderName: (folderId: number) => `/dir/${folderId}/folder/name`,
   CopyFolder: (folderId: number) => `/dir/${folderId}/folder/copy`,
   CutFolder: (folderId: number) => `/dir/${folderId}/folder/cut`,
@@ -64,6 +65,15 @@ export const postCutFolder = (folderId: number, targetDirId: number) => {
   })
 }
 
+export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) => {
+  return request.put<FetchResponse<{ flag: string }>>(Api.PutFixedQuickFolder(folderId), {
+    body: {
+      isFixed
+    }
+  }, {
+    isTransformResponse: false
+  })
+}
 
 export function getById<T>(id: number) {
   return request.get<T>(Api.GetById(id), {})

@@ -1,10 +1,11 @@
-import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
+import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, FlagEnum, GroupEnum } from '@/constants'
 import Base from './Base'
 import { useDirStore, usePathStore } from '@/stores'
 import Dir from './Dir'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
 import { ContextMenu } from '../ContextMenu'
+import { putFixedQuickFolder } from '@/api/dir'
 
 export default class Folder extends Base {
   readonly __prototype__: {
@@ -40,7 +41,14 @@ export default class Folder extends Base {
    * 菜单项
    */
   get menuItems(): any {
-    return this.__prototype__.menuItems
+    const builder = ContextMenu.builder()
+    // 快速访问
+    if (this.flag.includes(FlagEnum.QUICK)) {
+      builder.appendCancelFixedQuick()
+    } else {
+      builder.appendFixedQuick()
+    }
+    return this.__prototype__.menuItems.concat(builder.build())
   }
 
   /**
@@ -64,5 +72,10 @@ export default class Folder extends Base {
     historyChildren.value.length = 0
   }
 
-  quick = async () => { }
+  quick = async (isFixed: boolean = true) => {
+    const { fail, data } = await putFixedQuickFolder(this.id, isFixed)
+    if (!fail && data) {
+      this.flag = data.flag
+    }
+  }
 }

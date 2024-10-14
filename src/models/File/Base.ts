@@ -11,7 +11,7 @@ export default class Base {
   public icon!: string
   public size?: number
   public extension!: string
-  public flag!: number
+  public flag!: string
   public hash!: string
   public chunkTotal!: number
 

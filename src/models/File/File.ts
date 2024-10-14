@@ -46,6 +46,9 @@ export default class File extends Base {
    * 菜单项
    */
   get menuItems() {
+    // 追加额外菜单
+
+
     return this.__prototype__.menuItems
   }
 

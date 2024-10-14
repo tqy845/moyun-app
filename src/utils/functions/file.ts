@@ -124,27 +124,14 @@ export default {
    * @returns 文件/文件夹实例
    */
   metadataConversionFileInstance(fileRawModel: FileRawModel) {
-    const menuItems = fileUtils.isFile(fileRawModel)
-      ? //  根据不同的类型，返回不同的菜单
-      ContextMenu.builder()
-        .appendDownload()
-        .appendCut()
-        .appendCopy()
-        .appendRename()
-        .appendDelete()
-        .build()
-
-      : ContextMenu.builder()
-        .appendDownload()
-        .appendCut()
-        .appendCopy()
-        .appendRename()
-        .appendDelete()
-        .appendFixedQuick()
-        .build()
-
     return fileUtils.newFileObject(fileRawModel, {
-      menuItems
+      menuItems: ContextMenu.builder()
+        .appendDownload()
+        .appendCut()
+        .appendCopy()
+        .appendRename()
+        .appendDelete()
+        .build()
     })
   }
 }

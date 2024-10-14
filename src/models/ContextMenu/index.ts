@@ -171,7 +171,7 @@ export class ContextMenu {
             type,
             name,
             value: 'fixed-quick',
-            prefixIcon: `pin`,
+            icon: `pin`,
             color,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
@@ -187,7 +187,7 @@ export class ContextMenu {
      * @param {ContentMenuItemType} [type="text"] - 菜单项类型
      * @returns {ContextMenu}
      */
-    appendCancelFixedQuick(name: string = '从快捷访问取消固定', type: ContentMenuItemType = 'text'): ContextMenu {
+    appendCancelFixedQuick(name: string = '从“快捷访问”取消固定', type: ContentMenuItemType = 'text'): ContextMenu {
         this.items.push({
             type,
             name,

@@ -132,7 +132,7 @@ const eventMouseup = () => {
 }
 
 const eventMousemove = (event: MouseEvent) => {
-  console.log('移动')
+  // console.log('移动')
   const deltaX = Math.abs(event.clientX - dragStartX.value)
   const deltaY = Math.abs(event.clientY - dragStartY.value)
 
@@ -145,7 +145,7 @@ const eventMousemove = (event: MouseEvent) => {
     const height = Math.abs(currentY - dragStartY.value)
     const left = Math.min(currentX, dragStartX.value)
     const top = Math.min(currentY, dragStartY.value)
-    console.log(0)
+    // console.log(0)
 
     dragSelectionBox.value = { top, left, width, height }
 
