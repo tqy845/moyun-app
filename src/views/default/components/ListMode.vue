@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useFileStore, useSystemStore, usePathStore, useDirStore } from '@/stores'
+import { useFileStore, useSystemStore, usePathStore, useDirStore, useFileMapStore } from '@/stores'
 import File from '@/models/File/File'
 import Folder from '@/models/File/Folder'
 import {
@@ -10,11 +10,13 @@ import {
   TableRowData
 } from 'tdesign-vue-next'
 import { fileUtils } from '@/utils/functions'
+import { FileExtensionEnum } from '@/constants'
 
 const tableRef = ref()
 const { isDrag } = storeToRefs(useDirStore())
 const systemStore = useSystemStore()
 const fileStore = useFileStore()
+const { getItemById } = useFileMapStore()
 const { isSelected, removeSelected, clearSelected, addSelected } = usePathStore()
 const { currentDirSelectedFiles, currentDirFiles, isLoading } = storeToRefs(usePathStore())
 
@@ -130,8 +132,20 @@ const eventUpdateSelected = (
 
 const eventRowAttributes = (params: TableRowAttributes<TableRowData>) => {
   const { row } = params as TableRowData
-  return [{ 'data-id': row.id }]
+  return [{ 'data-id': row.id, 'data-type': row.__prototype__.type }]
 }
+
+onMounted(async () => {
+  await nextTick()
+  const fileEls = document.querySelectorAll('tr[data-id][data-type]')
+  fileEls.forEach((fileEl) => {
+    const fileId = fileEl.getAttribute('data-id')
+    const fileType = fileEl.getAttribute('data-type') as FileExtensionEnum
+    const file = getItemById(Number(fileId), fileType)
+    file.el = fileEl
+    console.log(file);
+  })
+})
 </script>
 
 <template>
