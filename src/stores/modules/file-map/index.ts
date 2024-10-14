@@ -13,8 +13,8 @@ export const useFileMapStore = defineStore(
       files.forEach((file) => (fileHashMap.value[`${file.__prototype__.type}-${file.id}`] = file))
     }
 
-    const getItemById = (folderId: number, fileType: FileExtensionEnum = FileExtensionEnum.FILE) => {
-      return fileHashMap.value[`${fileType}-${folderId}`]
+    const getItemById = (id: number, fileType: FileExtensionEnum = FileExtensionEnum.FILE) => {
+      return fileHashMap.value[`${fileType}-${id}`]
     }
 
     const deleteItemById = (id: number, fileType: FileExtensionEnum = FileExtensionEnum.FILE) => {

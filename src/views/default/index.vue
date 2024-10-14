@@ -1,23 +1,15 @@
 <script lang="ts" setup>
 import { mouseUtils } from '@/utils/functions'
 import { MOUSE_DIRECTION } from '@/utils/functions/mouse-functions'
-import {
-  useFileStore,
-  useSettingStore,
-  usePathStore,
-  useDirStore,
-  useFileRectMapStore
-} from '@/stores'
+import { useFileStore, useSettingStore, usePathStore, useDirStore, useFileMapStore } from '@/stores'
 import IconMode from './components/IconMode.vue'
 import ListMode from './components/ListMode.vue'
 import { ContentMenuItem, MoYunModeEnum } from '@/constants'
 import TheContextMenu from '@/components/TheContextMenu.vue'
 import { resetMode } from '@/stores/modules/file/helper'
 import { ContextMenu } from '@/models/ContextMenu'
-import { cloneDeep } from 'lodash'
 
 const containerRef = ref<HTMLElement>()
-const { calcNewData, getItemById } = useFileRectMapStore()
 const { clearSelected } = usePathStore()
 const { currentDir, currentActionFiles, currentDirFiles, currentDirSelectedFiles } =
   storeToRefs(usePathStore())
@@ -25,6 +17,7 @@ const { isDrag } = storeToRefs(useDirStore())
 const controlState = useKeyModifier('Control')
 const { isOutside } = useMouseInElement(containerRef)
 const { focused } = useFocus(containerRef)
+const { getItemById } = useFileMapStore()
 
 const { mode } = storeToRefs(useFileStore())
 const settingStore = useSettingStore()
@@ -33,13 +26,11 @@ const settingStore = useSettingStore()
 const currentMode = computed(() => (mode.value !== MoYunModeEnum.LIST ? IconMode : ListMode))
 
 // 拖拽事件
-let fileSelectorWorker: Worker
+let animationFrameId: number
 const isDragging = ref(false)
 const dragStartX = ref(0)
 const dragStartY = ref(0)
 const dragSelectionBox = ref({ top: 0, left: 0, width: 0, height: 0 })
-let animationFrameId: number | null = null
-
 /**
  * 绑定鼠标滚动实现修改Mode
  */
@@ -92,30 +83,8 @@ watchEffect(() => {
   menu.value.clear()
   menu.value.push(...createMenu())
 })
-
-onMounted(eventResetSize)
-// onUpdated(() => {
-//     resetMode()
-// })
-
-const createWorker = () => {
-  fileSelectorWorker = new Worker(new URL('@/workers/fileSelector.js', import.meta.url))
-  fileSelectorWorker.onmessage = (event) => {
-    const selectedFiles = event.data
-    // 更新 selectedFiles 状态
-    // console.log(selectedFiles)
-    console.log(3)
-    currentDirSelectedFiles.value.clear()
-    selectedFiles.forEach(({ id, extension }: { id: number; extension: string }) => {
-      currentDirSelectedFiles.value.push(
-        currentDirFiles.value.find((file) => file.id === id && file.extension === extension)
-      )
-    })
-  }
-}
-
 const eventMousedown = (event: MouseEvent) => {
-  console.log('按下')
+  getCurrentDirFileRect()
   isDragging.value = true
   dragStartX.value = event.clientX
   dragStartY.value = event.clientY
@@ -123,12 +92,10 @@ const eventMousedown = (event: MouseEvent) => {
 }
 
 const eventMouseup = () => {
-  console.log('松开')
   if (isDragging.value) {
     dragSelectionBox.value = { top: 0, left: 0, width: 0, height: 0 }
   }
   isDragging.value = false
-  fileSelectorWorker?.terminate?.()
 }
 
 const eventMousemove = (event: MouseEvent) => {
@@ -145,42 +112,60 @@ const eventMousemove = (event: MouseEvent) => {
     const height = Math.abs(currentY - dragStartY.value)
     const left = Math.min(currentX, dragStartX.value)
     const top = Math.min(currentY, dragStartY.value)
-    // console.log(0)
 
     dragSelectionBox.value = { top, left, width, height }
 
     // 销毁上一次的动画帧，确保只执行最新的
-    // if (animationFrameId) {
-      // cancelAnimationFrame(animationFrameId)
-    // }
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
+    }
 
     // 使用 requestAnimationFrame 调用 selectFilesInArea
-    // animationFrameId = requestAnimationFrame(() => {
+    animationFrameId = requestAnimationFrame(() => {
       selectFilesInArea()
-    // })
+    })
   }
 }
+
+const rectMapCache = new Map<string, DOMRect>()
 
 // 选择拖拽区域内的文件
 const selectFilesInArea = () => {
   if (!isDragging.value) {
     return
   }
-  fileSelectorWorker?.terminate?.()
-  createWorker()
-  console.log(1)
+  const selectionBox = dragSelectionBox.value
+  const selectedSet = new Set<string>() // 用于记录当前选中的文件 id + type
 
-  const selectionBox = cloneDeep(dragSelectionBox.value)
-  const files = currentDirFiles.value.map((file) => ({
-    id: file.id,
-    extension: file.extension,
-    // rect: document.querySelector(`[data-id='${file.id}']`)?.getBoundingClientRect() // 使用缓存的矩形信息
-    rect: getItemById(file.id) // 使用缓存的矩形信息
-  }))
-  console.log(2)
+  // 遍历所有文件，检查是否在选区内
+  currentDirFiles.value.forEach((file) => {
+    const rect = rectMapCache.get(file.id + file.__prototype__.type)
+    if (!rect) return
 
-  console.log(files)
-  fileSelectorWorker.postMessage({ selectionBox, files })
+    const isInSelection =
+      rect.left < selectionBox.left + selectionBox.width &&
+      rect.right > selectionBox.left &&
+      rect.top < selectionBox.top + selectionBox.height &&
+      rect.bottom > selectionBox.top
+
+    if (isInSelection) {
+      // 如果文件在选区内且未被选中，则添加选中
+      const existingFile = currentDirSelectedFiles.value.find(
+        (item) => item.id === file.id && item.__prototype__.type === file.__prototype__.type
+      )
+      if (!existingFile) {
+        currentDirSelectedFiles.value.push(getItemById(file.id, file.__prototype__.type))
+      }
+      selectedSet.add(file.id + file.__prototype__.type) // 记录已选中的文件
+    }
+  })
+
+  // 取消不在新选区内的文件
+  currentDirSelectedFiles.value = currentDirSelectedFiles.value.filter((item) => {
+    const fileKey = item.id + item.__prototype__.type
+    // 如果文件不在选区内，则从选中的文件列表中移除
+    return selectedSet.has(fileKey)
+  })
 }
 
 const _clearSelected = () => {
@@ -188,13 +173,25 @@ const _clearSelected = () => {
     isDrag.value = false
     return
   }
-
   clearSelected()
 }
 
-onMounted(calcNewData)
+const getCurrentDirFileRect = () => {
+  currentDirFiles.value.map((file) => {
+    rectMapCache.set(file.id + file.__prototype__.type, file.el?.getBoundingClientRect())
+  })
+}
+
+onMounted(() => {
+  eventResetSize()
+})
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(animationFrameId)
+})
 </script>
 <template>
+  <!-- {{ currentDirSelectedFiles }} -->
   <div
     ref="containerRef"
     class="h-full w-full pa-1 overflow-y-hidden"
@@ -209,7 +206,6 @@ onMounted(calcNewData)
         @contextmenu.stop="_clearSelected"
       />
     </TheContextMenu>
-
     <!-- 拖拽选取框 -->
     <div
       v-if="isDragging"

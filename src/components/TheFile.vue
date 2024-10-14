@@ -5,6 +5,7 @@ import { usePathStore, useSettingStore } from '@/stores'
 import { fileUtils } from '@/utils/functions'
 import { vOnClickOutside } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
+import { ComponentPublicInstance } from 'vue'
 
 const props = defineProps({
   file: {
@@ -91,8 +92,7 @@ onUpdated(updated)
     @click="eventSelected"
     @contextmenu="eventContextmenu"
     :data-id="file.id"
-    style="content-visibility: auto"
-    ref="fileRef"
+    :ref="(ref) => (file.el = (ref as ComponentPublicInstance)?.$el)"
   >
     <t-popup :delay="[1300, 0]" placement="bottom-left" showArrow>
       <!-- 扩展提示 -->
