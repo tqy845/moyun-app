@@ -82,33 +82,35 @@ export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) =
 }
 
 
+let searchFolderEventSource: EventSource | null = null
 export const sseSearchFolder = (folderId: number, keyword: string, callback: (data: { files: Array<FileRawModel> }) => void) => {
+  if (searchFolderEventSource) searchFolderEventSource.close()
   return new Promise<FetchResponse<{ files: Array<FileRawModel> }>>((resolve, reject) => {
     const userStore = useUserStore()
-    const eventSource = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword), {
+    searchFolderEventSource = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword), {
       headers: {
         'Authorization': `Bearer ${userStore.token}`
       }
     })
     // 文件搜索
-    eventSource.addEventListener(`content`, (event) => {
+    searchFolderEventSource.addEventListener(`content`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
       console.log("成功", result);
       callback?.(result.data!)
     })
     // 完成
-    eventSource.addEventListener(`complete`, (event) => {
+    searchFolderEventSource.addEventListener(`complete`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
-      eventSource.close()
+      searchFolderEventSource?.close()
       resolve(result)
     })
     // 失败
-    eventSource.addEventListener(`error`, (event) => {
+    searchFolderEventSource.addEventListener(`error`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
-      eventSource.close()
+      searchFolderEventSource?.close()
       reject(result)
     })
   })
