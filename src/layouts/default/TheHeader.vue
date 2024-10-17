@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useFileStore, useSystemStore, useDirStore, usePathStore } from '@/stores'
+import { useSystemStore, useDirStore, usePathStore } from '@/stores'
 import TheEllipsisPath from '@/components/TheEllipsisPath.vue'
 import { AppRunPlatformEnum } from '@/constants'
 import { InputValue } from 'tdesign-vue-next'
@@ -11,16 +11,15 @@ import BtnMore from './components/BtnMore.vue'
 import BtnMode from './components/BtnMode.vue'
 import BtnAssemble from '@/layouts/default/components/BtnAssemble.vue'
 import { useTemplateRef } from 'vue'
-import { sseSearchFolder } from '@/api/dir'
 
 const breadcrumbRef = useTemplateRef('breadcrumbRef')
 const breadcrumbContainerRef = ref()
 const systemStore = useSystemStore()
 const { back, forward } = usePathStore()
-const { isBaseLayout, search } = storeToRefs(useDirStore())
+const { isBaseLayout } = storeToRefs(useDirStore())
 const { isLoading } = storeToRefs(usePathStore())
 
-const { children, historyChildren, currentDir } = storeToRefs(usePathStore())
+const { children, keyword, historyChildren, currentDir, isSearchMode } = storeToRefs(usePathStore())
 
 const env = import.meta.env
 
@@ -59,9 +58,11 @@ const handleChangeStringPath = (e: MouseEvent) => {
 
 const handleSearch = useDebounceFn((key: InputValue) => {
   if (!key) {
+    isSearchMode.value = false
     currentDir.value.refresh()
     return
   }
+  isSearchMode.value = true
   currentDir.value.search(key.toString())
 }, 300)
 
@@ -127,7 +128,7 @@ onUpdated(executed)
           </t-button>
           <template #content>
             <div class="text-size-xs">
-              刷新"<span class="position-relative bottom-[1px]">{{ currentDir.name }}"(F5)</span>
+              刷新"<span class="position-relative bottom-[1px]">{{ currentDir?.name }}"(F5)</span>
             </div>
           </template>
         </t-popup>
@@ -171,27 +172,32 @@ onUpdated(executed)
             </template>
           </t-breadcrumb-item>
 
-          <!-- 操作提示 -->
-          <div v-if="children.isEmpty()" class="text-sm">正在跳转...</div>
-          <div v-else-if="search && isLoading" class="px-1 text-sm">
-            {{ `在“${currentDir?.name}”搜索中...` }}
-          </div>
-          <div v-else-if="search && !isLoading" class="px-1 text-sm">
-            {{ `在“${currentDir?.name}”搜索结果：` }}
+          <div v-if="isSearchMode">
+            <div v-if="keyword && !isLoading" class="px-1 text-sm">
+              {{ `在“${currentDir?.name}”搜索结果` }}
+            </div>
+
+            <!-- 操作提示 -->
+            <div v-if="children.isEmpty()" class="text-sm">正在跳转...</div>
+            <div v-else-if="keyword && isLoading" class="px-1 text-sm">
+              {{ `在“${currentDir?.name}”搜索中...` }}
+            </div>
           </div>
 
-          <div v-else class="flex">
-            <!-- 收缩的路径-->
-            <TheEllipsisPath v-if="systemStore.pathEllipsisLength" style="pointer-events: fill" />
+          <div v-else>
+            <div class="flex">
+              <!-- 收缩的路径-->
+              <TheEllipsisPath v-if="systemStore.pathEllipsisLength" style="pointer-events: fill" />
 
-            <!-- 展示的路径 -->
-            <t-breadcrumb-item
-              v-for="dir in children.slice(systemStore.pathEllipsisLength, children.length)"
-              :key="dir.id"
-              class="w-full"
-              @click.stop="dir.go()"
-              >{{ dir.name }}
-            </t-breadcrumb-item>
+              <!-- 展示的路径 -->
+              <t-breadcrumb-item
+                v-for="dir in children.slice(systemStore.pathEllipsisLength, children.length)"
+                :key="dir.id"
+                class="w-full"
+                @click.stop="dir.go()"
+                >{{ dir.name }}
+              </t-breadcrumb-item>
+            </div>
           </div>
         </t-breadcrumb>
       </div>
@@ -199,8 +205,8 @@ onUpdated(executed)
 
     <div class="mr-2" style="flex: 1 !important; min-width: 150px">
       <t-input
-        v-model="search"
-        :placeholder="`在 ${currentDir.name} 搜索`"
+        v-model="keyword"
+        :placeholder="`在 ${currentDir?.name} 搜索`"
         class="w-full !h-[32px]"
         clearable
         inputClass="!border-none !rounded-[4px] !bg-[#fcfbfb]"

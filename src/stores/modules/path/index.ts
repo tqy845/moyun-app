@@ -24,14 +24,17 @@ export const usePathStore = defineStore(
     const { isBaseLayout } = storeToRefs(useDirStore())
     const { readPhotoAlbum } = useDirStore()
     const { fileSortMode, fileSortType } = storeToRefs(useSettingStore())
+    const keyword = ref('')
+    const isSearchMode = ref(false)
     const { getItemById } = useFileMapStore()
+
 
     const isSelected = (file: File | Folder) => {
       return currentDirSelectedFiles.value.includes(file)
     }
     const clearSelected = () => {
       console.log("触发");
-      
+
       currentDirSelectedFiles.value.length = 0
     }
     const addSelected = (...file: Array<File | Folder>) => {
@@ -192,6 +195,8 @@ export const usePathStore = defineStore(
       currentDirFiles,
       currentDirSelectedFiles,
       currentActionFiles,
+      keyword,
+      isSearchMode,
 
       isSelected,
       clearSelected,

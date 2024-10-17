@@ -23,7 +23,6 @@ export const useDirStore = defineStore(
     )
     const folderSelect = ref(false)
     const { photoAlbumParentId } = storeToRefs(useSettingStore())
-    const search = ref('')
     const isBaseLayout = computed(() => asideMenuObjectCurrentIndexItem.value.name !== '图库')
     const isDrag = ref(false)
 
@@ -94,7 +93,6 @@ export const useDirStore = defineStore(
     }
 
     return {
-      search,
       asideMenuObject,
       asideMenuObjectCurrentIndexItem,
       isBaseLayout,
