@@ -86,8 +86,8 @@ const handleAfterEnter = (el: Element) => {
           >
             <t-list class="pa-0 !m-0 rounded">
               <t-list-item
-                v-for="item in textMenu"
-                :key="item.id"
+                v-for="(item) in textMenu"
+                :key="item.value"
                 aria-controls
                 class="menu-item"
                 size="small"
@@ -95,7 +95,7 @@ const handleAfterEnter = (el: Element) => {
               >
                 <div class="flex items-center justify-center">
                   <div class="mr-3">
-                    <TheIcon :name="item.icon" size="large" />
+                    <TheIcon :name="item.icon || ''" size="large" />
                   </div>
                   <div>{{ item.name }}</div>
                 </div>
@@ -110,14 +110,14 @@ const handleAfterEnter = (el: Element) => {
               <div v-if="iconMenu.length" class="pa-1">
                 <t-button
                   v-for="item in iconMenu"
-                  :key="item.id"
+                  :key="item.value"
                   :theme="item.color || 'default'"
                   class="mr-1"
                   shape="square"
                   variant="text"
                   @click.stop="handleSelected(item)"
                 >
-                  <TheIcon :name="item.icon" size="large" />
+                  <TheIcon :name="item.icon || ''" size="large" />
                 </t-button>
               </div>
             </template>

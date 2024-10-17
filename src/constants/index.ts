@@ -1,3 +1,5 @@
+import Folder from "@/models/File/Folder"
+
 // 标签类型
 type TagTheme = 'default' | 'success' | 'primary' | 'warning' | 'danger'
 // 通知的优先级对应的标签类型
@@ -163,7 +165,7 @@ export type ContentMenuItemType = 'text' | 'icon'
 export type ContentMenuItem = {
   type: ContentMenuItemType
   name: string
-  action: () => any
+  action: (folder?: Folder) => any
   icon?: string
   prefixIcon?: string
   shortcutKey?: string

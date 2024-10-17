@@ -1,4 +1,4 @@
-import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
+import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, FlagEnum, GroupEnum } from '@/constants'
 import Base from './Base'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
@@ -23,15 +23,16 @@ export default class File extends Base {
 
   constructor(object: FileRawModel, options?: Prototype) {
     super(object)
+    const menuItems = ContextMenu.builder()
+      .appendOpen()
+      .appendLookAttr()
+      .build()
+
     this.__prototype__ = Object.assign({
       group: options?.group ?? GroupEnum.USER,
       level: options?.level ?? FileLevelEnum.OTHER,
       type: FileExtensionEnum.FILE,
-      menuItems: ContextMenu.builder()
-        .appendOpen()
-        .appendLookAttr()
-        .build()
-        .concat(options?.menuItems || [])
+      menuItems
     })
   }
 
@@ -45,11 +46,16 @@ export default class File extends Base {
   /**
    * 菜单项
    */
-  get menuItems() {
+  getMenuItems(flag?: FlagEnum) {
     // 追加额外菜单
+    const builder = ContextMenu.builder()
+    builder.appendDownload()
+      .appendCut()
+      .appendCopy()
+      .appendRename()
+      .appendDelete()
 
-
-    return this.__prototype__.menuItems
+    return this.__prototype__.menuItems.concat(builder.build())
   }
 
   /**

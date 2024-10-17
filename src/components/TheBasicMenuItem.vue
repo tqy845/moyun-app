@@ -30,7 +30,7 @@ onMounted(executed)
 
 <template>
   <!-- 普通目录-->
-  <TheContextMenu :menu="folderRef?.menuItems" @select="handleSelected">
+  <TheContextMenu :menu="folderRef?.getMenuItems()" @select="handleSelected">
     <t-menu-item
       v-for="(folder, index) in menus"
       :key="index"

@@ -21,15 +21,16 @@ export default class Folder extends Base {
 
   constructor(object: FileRawModel, options?: Prototype) {
     super(object)
+    const menuItems = ContextMenu.builder()
+      .appendOpen()
+      .appendLookAttr()
+      .build()
+
     this.__prototype__ = Object.assign({
       group: options?.group ?? GroupEnum.USER,
       level: options?.level ?? FileLevelEnum.OTHER,
       type: FileExtensionEnum.FOLDER,
-      menuItems: ContextMenu.builder()
-        .appendOpen()
-        .appendLookAttr()
-        .build()
-        .concat(options?.menuItems || [])
+      menuItems
     })
   }
 
@@ -40,13 +41,26 @@ export default class Folder extends Base {
   /**
    * 菜单项
    */
-  get menuItems(): any {
+  getMenuItems(flag?: FlagEnum): any {
     const builder = ContextMenu.builder()
-    // 快速访问
-    if (this.flag.includes(FlagEnum.QUICK)) {
-      builder.appendCancelFixedQuick()
+
+    if (this.hasFlag(FlagEnum.ASIDE)) {
+      if (this.hasFlag(FlagEnum.QUICK)) {
+        builder.appendCancelFixedQuick()
+      }
+
     } else {
-      builder.appendFixedQuick()
+      // 快速访问
+      if (this.hasFlag(FlagEnum.QUICK) && flag === FlagEnum.QUICK) {
+        builder.appendCancelFixedQuick()
+      } else {
+        builder.appendFixedQuick()
+          .appendDownload()
+          .appendCut()
+          .appendCopy()
+          .appendRename()
+          .appendDelete()
+      }
     }
     return this.__prototype__.menuItems.concat(builder.build())
   }

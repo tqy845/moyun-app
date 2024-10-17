@@ -124,14 +124,6 @@ export default {
    * @returns 文件/文件夹实例
    */
   metadataConversionFileInstance(fileRawModel: FileRawModel) {
-    return fileUtils.newFileObject(fileRawModel, {
-      menuItems: ContextMenu.builder()
-        .appendDownload()
-        .appendCut()
-        .appendCopy()
-        .appendRename()
-        .appendDelete()
-        .build()
-    })
+    return fileUtils.newFileObject(fileRawModel, {})
   }
 }

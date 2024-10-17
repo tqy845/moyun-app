@@ -21,7 +21,7 @@ const selectedFile = ref<File | Folder>()
     class="mo-yun-container h-[0] !box-border"
   >
     <div v-for="(file, index) in dirFiles" :key="index">
-      <TheContextMenu :menu="selectedFile?.menuItems" @select="$event.action(selectedFile)">
+      <TheContextMenu :menu="selectedFile?.getMenuItems()" @select="$event.action(selectedFile)">
         <TheFile
           :file="file"
           class="ma-1"

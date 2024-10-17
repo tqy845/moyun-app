@@ -1,6 +1,6 @@
 import { ContentMenuItem, ContentMenuItemType, FileExtensionEnum } from "@/constants"
 import { usePathStore, useFileStore, UploadEventFromEnum } from "@/stores"
-import { cloneDeep } from "lodash"
+import Folder from "../File/Folder"
 
 
 type ColorType = "default" | "primary" | "danger" | "success" | "warning" | undefined
@@ -272,7 +272,11 @@ export class ContextMenu {
             name,
             icon: 'gesture-up-1',
             shortcutKey,
-            action: () => {
+            action: (folder?: Folder) => {
+                if (folder) {
+                    folder.open()
+                    return
+                }
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.open())
             }
@@ -286,7 +290,11 @@ export class ContextMenu {
             name,
             icon: 'tools',
             shortcutKey,
-            action: () => {
+            action: (folder?: Folder) => {
+                if (folder) {
+                    folder.open()
+                    return
+                }
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.detail())
             }
@@ -390,6 +398,6 @@ export class ContextMenu {
 
 
     build(): Array<ContentMenuItem> {
-        return cloneDeep(this.items)
+        return this.items
     }
 }

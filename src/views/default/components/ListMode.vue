@@ -150,7 +150,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="currentDirFiles.length">
-    <TheContextMenu :menu="selectedFile?.menuItems" @select="$event.action(selectedFile)">
+    <TheContextMenu :menu="selectedFile?.getMenuItems()" @select="$event.action(selectedFile)">
       <t-table
         class="!bg-transparent"
         ref="tableRef"

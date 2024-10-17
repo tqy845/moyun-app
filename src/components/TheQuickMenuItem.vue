@@ -22,7 +22,7 @@ onMounted(executed)
 </script>
 
 <template>
-  <TheContextMenu :menu="folderRef?.menuItems" @select="handleSelected">
+  <TheContextMenu :menu="folderRef?.getMenuItems(FlagEnum.QUICK)" @select="handleSelected">
     <t-menu-item
       v-for="folder in menus"
       :key="folder.id"
