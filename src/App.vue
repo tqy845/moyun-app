@@ -1,4 +1,8 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+// window.addEventListener('contextmenu', (e) => {
+//   e.preventDefault();
+// });
+</script>
 
 <template>
   <RouterView v-mouse-disabled-context-menu />

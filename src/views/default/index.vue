@@ -200,6 +200,7 @@ onBeforeUnmount(() => {
     @mousedown.stop="eventMousedown"
     @mousemove.stop="eventMousemove"
     @mouseup.stop="eventMouseup"
+    v-mouse-disabled-context-menu
   >
     <TheContextMenu :menu="menu" class="h-full" @select="$event?.action()">
       <component

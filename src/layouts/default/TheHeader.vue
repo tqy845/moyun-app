@@ -21,6 +21,7 @@ const { isBaseLayout, search } = storeToRefs(useDirStore())
 const { isLoading } = storeToRefs(usePathStore())
 
 const { children, historyChildren, currentDir } = storeToRefs(usePathStore())
+
 const env = import.meta.env
 
 const cs = reactive({
@@ -58,13 +59,10 @@ const handleChangeStringPath = (e: MouseEvent) => {
 
 const handleSearch = useDebounceFn((key: InputValue) => {
   if (!key) {
+    currentDir.value.refresh()
     return
   }
-  console.log('key', key)
-
-  sseSearchFolder(currentDir.value.id, key.toString())
-  // const path = children.value.pop()!
-  // path.open()
+  currentDir.value.search(key.toString())
 }, 300)
 
 const switchPathType = (type: PathType) => {
@@ -176,10 +174,10 @@ onUpdated(executed)
           <!-- 操作提示 -->
           <div v-if="children.isEmpty()" class="text-sm">正在跳转...</div>
           <div v-else-if="search && isLoading" class="px-1 text-sm">
-            {{ `在“${children.peek()?.name}”搜索中...` }}
+            {{ `在“${currentDir?.name}”搜索中...` }}
           </div>
           <div v-else-if="search && !isLoading" class="px-1 text-sm">
-            {{ `在“${children.peek()?.name}”搜索结果如下：` }}
+            {{ `在“${currentDir?.name}”搜索结果：` }}
           </div>
 
           <div v-else class="flex">

@@ -14,3 +14,4 @@ export interface AsideMenuModel {
 export interface FolderCopyOptionModel extends FileCopyOptionModel {
 
 }
+

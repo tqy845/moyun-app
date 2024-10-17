@@ -1,4 +1,4 @@
-import { getFileList } from '@/api/dir'
+import { getFileList, sseSearchFolder } from '@/api/dir'
 import Folder from './Folder'
 import { FileRawModel } from '@/api/models/fileModel'
 import { useDirStore, useFileMapStore, usePathStore } from '@/stores'
@@ -33,13 +33,27 @@ export default class Dir {
   }
 
   /**
+   * 搜索文件夹
+   * @param keyword 关键字
+   */
+  search = async (keyword: string) => {
+    this.clear()
+    await sseSearchFolder(this.id, keyword, ({ files }) => files.forEach(file => this.appendFile(file)))
+  }
+
+  /**
    * 读取当前目录下的文件
    */
   readDir = async () => {
     const fileMapStore = useFileMapStore()
-    const { isLoading, currentDirFiles } = storeToRefs(usePathStore())
+    const { isLoading, currentDirFiles, currentActionFiles, currentDirSelectedFiles } = storeToRefs(usePathStore())
     isLoading.value = true
+
+    // 初始化
     currentDirFiles.value.clear()
+    currentActionFiles.value.clear()
+    currentDirSelectedFiles.value.clear()
+
     const { sort } = usePathStore()
     const { files } = await getFileList(this.id, {
       page: 1,
@@ -56,6 +70,7 @@ export default class Dir {
     isLoading.value = false
     return
   }
+
 
   /**
    * 追加一个文件到本目录
@@ -86,5 +101,13 @@ export default class Dir {
     // 系统目录切换到当前路径
     const currentIndex = children.value.findIndex((dir) => dir.id === this.id)
     children.value.length = currentIndex + 1
+  }
+
+  clear = () => {
+    const { currentDirFiles, currentActionFiles, currentDirSelectedFiles } = storeToRefs(usePathStore())
+    // 初始化
+    currentDirFiles.value.clear()
+    currentActionFiles.value.clear()
+    currentDirSelectedFiles.value.clear()
   }
 }
