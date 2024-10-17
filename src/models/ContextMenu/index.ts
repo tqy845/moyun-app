@@ -292,7 +292,7 @@ export class ContextMenu {
             shortcutKey,
             action: (folder?: Folder) => {
                 if (folder) {
-                    folder.open()
+                    folder.detail()
                     return
                 }
                 const { currentDirSelectedFiles } = usePathStore()
