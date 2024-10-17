@@ -1,7 +1,10 @@
 import { request } from '@/utils/request'
 import { FileRawModel } from '@/api/models/fileModel'
 import { QueryDirectoryModel, AsideMenuModel, FolderCopyOptionModel } from '@/api/models/dirModel'
-import { FetchResponse } from '@/utils/request/utils.ts'
+import { FetchResponse } from '@/utils/request/utils'
+import { EventSourcePolyfill } from "event-source-polyfill";
+import { useUserStore } from '@/stores';
+
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_API
 
@@ -79,9 +82,18 @@ export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) =
 }
 
 export const sseSearchFolder = (folderId: number, keyword: string) => {
-  const eventSource = new EventSource(Api.SearchFolder(folderId, keyword))
+  const userStore = useUserStore()
+  const eventSource = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword),{
+    headers:{
+      'Authorization': `Bearer ${userStore.token}`
+    }
+  })
+  
+  eventSource.onopen = (event)=>{
+    console.log("连接成功",event)
+  }
   eventSource.onmessage = (event) => {
-    console.log(event)
+    console.log("成功了",event.data)
   }
   eventSource.onerror = (error) => {
     console.log("出错了",error)

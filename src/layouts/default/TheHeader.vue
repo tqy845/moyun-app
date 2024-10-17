@@ -60,6 +60,8 @@ const handleSearch = useDebounceFn((key: InputValue) => {
   if (!key) {
     return
   }
+  console.log('key', key)
+
   sseSearchFolder(currentDir.value.id, key.toString())
   // const path = children.value.pop()!
   // path.open()
