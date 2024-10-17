@@ -82,22 +82,30 @@ export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) =
 }
 
 export const sseSearchFolder = (folderId: number, keyword: string) => {
-  const userStore = useUserStore()
-  const eventSource = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword),{
-    headers:{
-      'Authorization': `Bearer ${userStore.token}`
-    }
+  return new Promise((resolve, reject) => {
+    const userStore = useUserStore()
+    const eventSource = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword), {
+      headers: {
+        'Authorization': `Bearer ${userStore.token}`
+      }
+    })
+    // 文件搜索
+    eventSource.addEventListener(`folder-search`, (event) => {
+      console.log("成功", event);
+    })
+    // 完成
+    eventSource.addEventListener(`completed`, (event) => {
+      console.log("完成", event);
+      resolve(true)
+    })
+    // 失败
+    eventSource.addEventListener(`error`, (error) => {
+      console.log(error);
+      eventSource.close()
+      reject(false)
+    })
   })
-  
-  eventSource.onopen = (event)=>{
-    console.log("连接成功",event)
-  }
-  eventSource.onmessage = (event) => {
-    console.log("成功了",event.data)
-  }
-  eventSource.onerror = (error) => {
-    console.log("出错了",error)
-  }
+
 }
 
 export function getById<T>(id: number) {

@@ -67,7 +67,7 @@ export const postPostUploadAddress = <T>(body: any) => {
   })
 }
 
-export const postBuildUploadTask = (body: BuildFileUploadModel) => {
+export const postBuildUploadTask = (body: any) => {
   return request.post<FetchResponse<BuildFileUploadResultModel>>(
     Api.BuildUploadTask,
     {
