@@ -3,6 +3,8 @@ import { FileRawModel } from '@/api/models/fileModel'
 import { QueryDirectoryModel, AsideMenuModel, FolderCopyOptionModel } from '@/api/models/dirModel'
 import { FetchResponse } from '@/utils/request/utils.ts'
 
+const BASE_URL = import.meta.env.VITE_APP_BASE_API
+
 const Api = {
   NewFolder: (parentId: number) => `/dir/${parentId}`,
   AsideMenu: `/dir/menu/aside/list`,
@@ -17,6 +19,7 @@ const Api = {
   GetFileList: (id: number) => `/dir/${id}`,
   GetDirList: (id: number) => `/dir/${id}/list`,
   GetPhotoList: (id: number) => `/dir/photo/${id}/list`,
+  SearchFolder: (id: number, keyword: string) => `${BASE_URL}/dir/${id}/search?keyword=${keyword}`
 }
 
 export function getAsideMenu() {
@@ -73,6 +76,16 @@ export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) =
   }, {
     isTransformResponse: false
   })
+}
+
+export const sseSearchFolder = (folderId: number, keyword: string) => {
+  const eventSource = new EventSource(Api.SearchFolder(folderId, keyword))
+  eventSource.onmessage = (event) => {
+    console.log(event)
+  }
+  eventSource.onerror = (error) => {
+    console.log("出错了",error)
+  }
 }
 
 export function getById<T>(id: number) {

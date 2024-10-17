@@ -11,13 +11,14 @@ import BtnMore from './components/BtnMore.vue'
 import BtnMode from './components/BtnMode.vue'
 import BtnAssemble from '@/layouts/default/components/BtnAssemble.vue'
 import { useTemplateRef } from 'vue'
+import { sseSearchFolder } from '@/api/dir'
 
 const breadcrumbRef = useTemplateRef('breadcrumbRef')
 const breadcrumbContainerRef = ref()
 const systemStore = useSystemStore()
 const { back, forward } = usePathStore()
-const { isBaseLayout ,search} = storeToRefs(useDirStore())
-const {isLoading} = storeToRefs(usePathStore())
+const { isBaseLayout, search } = storeToRefs(useDirStore())
+const { isLoading } = storeToRefs(usePathStore())
 
 const { children, historyChildren, currentDir } = storeToRefs(usePathStore())
 const env = import.meta.env
@@ -55,13 +56,14 @@ const handleChangeStringPath = (e: MouseEvent) => {
   pathType.value = 'string'
 }
 
-const handleSearch = (key: InputValue) => {
-  if (key) {
+const handleSearch = useDebounceFn((key: InputValue) => {
+  if (!key) {
     return
   }
+  sseSearchFolder(currentDir.value.id, key.toString())
   // const path = children.value.pop()!
   // path.open()
-}
+}, 300)
 
 const switchPathType = (type: PathType) => {
   pathType.value = type
@@ -125,9 +127,7 @@ onUpdated(executed)
           </t-button>
           <template #content>
             <div class="text-size-xs">
-              刷新"<span class="position-relative bottom-[1px]"
-            >{{ currentDir.name }}"(F5)</span
-            >
+              刷新"<span class="position-relative bottom-[1px]">{{ currentDir.name }}"(F5)</span>
             </div>
           </template>
         </t-popup>
@@ -190,7 +190,7 @@ onUpdated(executed)
               :key="dir.id"
               class="w-full"
               @click.stop="dir.go()"
-            >{{ dir.name }}
+              >{{ dir.name }}
             </t-breadcrumb-item>
           </div>
         </t-breadcrumb>
