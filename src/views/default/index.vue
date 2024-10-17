@@ -140,7 +140,7 @@ const selectFilesInArea = () => {
   // 遍历所有文件，检查是否在选区内
   currentDirFiles.value.forEach((file) => {
     const rect = rectMapCache.get(file.id + file.__prototype__.type)
-    console.log('rect = ', rect, file.el)
+    // console.log('rect = ', rect, file.el)
 
     if (!rect) return
 
