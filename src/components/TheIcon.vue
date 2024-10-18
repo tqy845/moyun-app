@@ -72,7 +72,7 @@ onUpdated(executed)
         name="icon-tuxiangimages17"
         url="src/assets/icons/iconfont"
         draggable="false"
-        :size="width"
+        :size="String(width)"
       />
     </template>
     <template #error>
@@ -81,7 +81,7 @@ onUpdated(executed)
         name="icon-tuxiangimages17"
         url="src/assets/icons/iconfont"
         draggable="false"
-        :size="width"
+        :size="String(width)"
       />
     </template>
   </t-image>
