@@ -1,11 +1,5 @@
 <script lang="ts" setup>
-import {
-  useFileStore,
-  useSettingStore,
-  useSystemStore,
-  usePathStore,
-  useDirStore,
-} from '@/stores'
+import { useFileStore, useSettingStore, useSystemStore, usePathStore, useDirStore } from '@/stores'
 import File from '@/models/File/File'
 import Folder from '@/models/File/Folder'
 import { useTemplateRef } from 'vue'
@@ -17,7 +11,8 @@ const systemStore = useSystemStore()
 const fileStore = useFileStore()
 const settingStore = useSettingStore()
 const { isBaseLayout } = storeToRefs(useDirStore())
-const { currentDirFiles, currentDirSelectedFiles, isLoading } = storeToRefs(usePathStore())
+const { currentDirFiles, currentDirSelectedFiles, isLoading, isSearchMode } =
+  storeToRefs(usePathStore())
 
 const dirFiles = computed(() => currentDirFiles.value as unknown as Array<File | Folder>)
 
@@ -40,7 +35,6 @@ fileStore.$subscribe(async ({ type }: { type: string }) => {
     iconModeRef.value.scrollTop = iconModeRef.value?.scrollHeight
   }
 })
-
 </script>
 
 <template>
@@ -58,7 +52,7 @@ fileStore.$subscribe(async ({ type }: { type: string }) => {
     </div>
   </div>
 
-  <TheEmpty v-else :empty="dirFiles.length === 0" :loading="isLoading" />
+  <TheEmpty v-else :empty="dirFiles.length === 0 && !isSearchMode" :loading="isLoading" />
 </template>
 
 <style lang="scss" scoped>

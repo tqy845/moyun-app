@@ -71,7 +71,7 @@ const handleAfterEnter = (el: Element) => {
       >
         <div
           v-if="visible"
-          v-mouse-disabled-context-menu
+          
           :style="{
             left: x + 'px',
             top: y + 'px'

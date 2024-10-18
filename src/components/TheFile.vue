@@ -84,7 +84,7 @@ onUpdated(updated)
 
 <template>
   <t-card
-    v-mouse-disabled-context-menu
+    
     :bordered="false"
     :class="[selectedStyles]"
     :style="{ '--file-container-width': `${fileSize}px` }"

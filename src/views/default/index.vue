@@ -5,7 +5,6 @@ import { useFileStore, useSettingStore, usePathStore, useDirStore, useFileMapSto
 import IconMode from './components/IconMode.vue'
 import ListMode from './components/ListMode.vue'
 import { ContentMenuItem, MoYunModeEnum } from '@/constants'
-import TheContextMenu from '@/components/TheContextMenu.vue'
 import { resetMode } from '@/stores/modules/file/helper'
 import { ContextMenu } from '@/models/ContextMenu'
 
@@ -15,7 +14,6 @@ const { currentDir, currentActionFiles, currentDirFiles, currentDirSelectedFiles
   storeToRefs(usePathStore())
 const { isDrag } = storeToRefs(useDirStore())
 const controlState = useKeyModifier('Control')
-const { isOutside } = useMouseInElement(containerRef)
 const { focused } = useFocus(containerRef)
 const { getItemById } = useFileMapStore()
 
@@ -35,17 +33,18 @@ const dragSelectionBox = ref({ top: 0, left: 0, width: 0, height: 0 })
  * 绑定鼠标滚动实现修改Mode
  */
 const eventResetSize = () => {
-  containerRef.value!.addEventListener('wheel', (event: WheelEvent) => {
-    if (!focused.value) focused.value = true
-    if (isOutside.value) return
-    if (!controlState.value) return
-    mouseUtils.scrollWheel(event, (direction: number) => {
-      const scrollValue = direction === MOUSE_DIRECTION.DOWN ? 10 : -10
-      settingStore.fileSize += scrollValue
-      resetMode()
-    })
+  containerRef.value?.addEventListener('wheel', wheelEvent)
+  containerRef.value?.focus()
+}
+
+const wheelEvent = (event: WheelEvent) => {
+  if (!focused.value) focused.value = true
+  if (!controlState.value) return
+  mouseUtils.scrollWheel(event, (direction: number) => {
+    const scrollValue = direction === MOUSE_DIRECTION.DOWN ? 10 : -10
+    settingStore.fileSize += scrollValue
+    resetMode()
   })
-  containerRef.value!.focus()
 }
 
 const isPhotoAlbum = computed(() => currentDir.value.rawFolder.name === '图库')
@@ -83,7 +82,11 @@ watchEffect(() => {
   menu.value.clear()
   menu.value.push(...createMenu())
 })
+
+let isMousedown = false
 const eventMousedown = (event: MouseEvent) => {
+  // console.log('按下')
+  isMousedown = true
   getCurrentDirFileRect()
   isDragging.value = true
   dragStartX.value = event.clientX
@@ -92,6 +95,8 @@ const eventMousedown = (event: MouseEvent) => {
 }
 
 const eventMouseup = () => {
+  // console.log('松开')
+  isMousedown = false
   if (isDragging.value) {
     dragSelectionBox.value = { top: 0, left: 0, width: 0, height: 0 }
   }
@@ -99,11 +104,13 @@ const eventMouseup = () => {
 }
 
 const eventMousemove = (event: MouseEvent) => {
+  if (!isDragging.value || !isMousedown) return
   // console.log('移动')
+
   const deltaX = Math.abs(event.clientX - dragStartX.value)
   const deltaY = Math.abs(event.clientY - dragStartY.value)
 
-  if ((isDragging.value && deltaX > 3) || deltaY > 3) {
+  if (deltaX > 3 || deltaY > 3) {
     isDrag.value = true
     const currentX = event.clientX
     const currentY = event.clientY
@@ -129,6 +136,8 @@ const eventMousemove = (event: MouseEvent) => {
 
 const rectMapCache = new Map<string, DOMRect>()
 
+// 是否进行了拖拽选取
+let dropSelected = false
 // 选择拖拽区域内的文件
 const selectFilesInArea = () => {
   if (!isDragging.value) {
@@ -151,6 +160,7 @@ const selectFilesInArea = () => {
       rect.bottom > selectionBox.top
 
     if (isInSelection) {
+      dropSelected = true
       // 如果文件在选区内且未被选中，则添加选中
       const existingFile = currentDirSelectedFiles.value.find(
         (item) => item.id === file.id && item.__prototype__.type === file.__prototype__.type
@@ -158,7 +168,8 @@ const selectFilesInArea = () => {
       if (!existingFile) {
         currentDirSelectedFiles.value.push(getItemById(file.id, file.__prototype__.type))
       }
-      selectedSet.add(file.id + file.__prototype__.type) // 记录已选中的文件
+      // 记录已选中的文件
+      selectedSet.add(file.id + file.__prototype__.type)
     }
   })
 
@@ -171,18 +182,31 @@ const selectFilesInArea = () => {
 }
 
 const _clearSelected = () => {
-  if (isDrag.value) {
-    isDrag.value = false
+  if (dropSelected) {
+    // 如果点击后进行了拖拽，则免除本次清空
+    dropSelected = false
     return
   }
   clearSelected()
 }
 
 const getCurrentDirFileRect = () => {
-  currentDirFiles.value.map((file) => {
-    rectMapCache.set(file.id + file.__prototype__.type, file.el?.getBoundingClientRect())
+  currentDirFiles.value.forEach((file) => {
+    const rect = file.el?.getBoundingClientRect()
+    if (rect) {
+      rectMapCache.set(file.id + file.__prototype__.type, rect)
+    }
   })
 }
+
+const globalMouseupEvent = () => {
+  if (isMousedown) {
+    eventMouseup()
+    dropSelected = false
+  }
+}
+
+window.addEventListener('mouseup', globalMouseupEvent)
 
 onMounted(() => {
   eventResetSize()
@@ -190,6 +214,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cancelAnimationFrame(animationFrameId)
+  containerRef.value?.removeEventListener('wheel', wheelEvent)
+  window.removeEventListener('mouseup', globalMouseupEvent)
 })
 </script>
 <template>
@@ -200,19 +226,18 @@ onBeforeUnmount(() => {
     @mousedown.stop="eventMousedown"
     @mousemove.stop="eventMousemove"
     @mouseup.stop="eventMouseup"
-    v-mouse-disabled-context-menu
   >
-    <TheContextMenu :menu="menu" class="h-full" @select="$event?.action()">
+    <TheContextMenu :menu="menu" class="!h-full bg-red" @select="$event?.action()">
       <component
         :is="currentMode"
         @click.stop="_clearSelected"
-        @contextmenu.stop="_clearSelected"
+        @contextmenu.prevent="_clearSelected"
       />
     </TheContextMenu>
     <!-- 拖拽选取框 -->
     <div
       v-if="isDragging"
-      class="pos-absolute pointer-events-none"
+      class="pos-absolute pointer-events-none z-[9999]"
       :style="{
         top: dragSelectionBox.top + 'px',
         left: dragSelectionBox.left + 'px',

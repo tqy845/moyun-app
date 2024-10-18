@@ -18,7 +18,7 @@ const selectedFile = ref<File | Folder>()
     :style="{
       'grid-template-columns': `repeat(auto-fill, minmax(${fileSize + 10}px, 1fr))`
     }"
-    class="mo-yun-container h-[0] !box-border"
+    class="mo-yun-container !h-[0] !box-border"
   >
     <div v-for="(file, index) in dirFiles" :key="index">
       <TheContextMenu :menu="selectedFile?.getMenuItems()" @select="$event.action(selectedFile)">

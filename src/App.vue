@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-// window.addEventListener('contextmenu', (e) => {
-//   e.preventDefault();
-// });
+// 禁用默认菜单
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
 </script>
 
 <template>
-  <RouterView v-mouse-disabled-context-menu />
+  <RouterView  />
 </template>
 
 <style>
