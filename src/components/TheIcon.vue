@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { baseUtils } from '@/utils/functions'
-import { useUserStore } from "@/stores"
+import { useUserStore } from '@/stores'
+import { CircleIcon } from 'tdesign-icons-vue-next'
 
 const { endpoint } = useUserStore()
 
@@ -36,20 +37,65 @@ const executed = () => {
   }
 }
 
+const handleSuccess = (src: string) => {
+  const el = document.querySelector(`[src="${src}"]`)
+  el?.setAttribute('draggable', 'false')
+}
+
 onMounted(executed)
 onUpdated(executed)
 </script>
 
 <template>
   <!-- 如果有 filename，则显示缩略图 -->
-  <img v-if="filename" loading="lazy"
+  <t-image
+    v-if="filename"
     :src="`http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`"
-    :style="{ height: `${width}px` }" class="!bg-transparent !filter-drop-shadow inline-block object-contain" draggable="false" />
+    :srcset="{
+      'image/webp': `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`,
+      'image/avif': ``
+    }"
+    :lazy="true"
+    :style="{ height: `${width}px`, width: `${width}px` }"
+    class="!bg-transparent !filter-drop-shadow inline-block object-contain"
+    draggable="false"
+    fit="scale-down"
+    @load="
+      handleSuccess(
+        `http://${endpoint}/moyun-bucket-1/thumbnail/${encodeURIComponent(filename)}.webp`
+      )
+    "
+  >
+    <template #loading>
+      <t-icon
+        :loadDefaultIcons="false"
+        name="icon-tuxiangimages17"
+        url="src/assets/icons/iconfont"
+        draggable="false"
+        :size="width"
+      />
+    </template>
+    <template #error>
+      <t-icon
+        :loadDefaultIcons="false"
+        name="icon-tuxiangimages17"
+        url="src/assets/icons/iconfont"
+        draggable="false"
+        :size="width"
+      />
+    </template>
+  </t-image>
   <!-- 内部图标 -->
   <component :is="iconRef" v-else-if="!external" v-bind="$attrs" draggable="false"></component>
   <!-- 外部图标-->
-  <t-icon v-else :loadDefaultIcons="false" :name="`icon-${name}`" url="src/assets/icons/iconfont" v-bind="$attrs"
-    draggable="false" />
+  <t-icon
+    v-else
+    :loadDefaultIcons="false"
+    :name="`icon-${name}`"
+    url="src/assets/icons/iconfont"
+    v-bind="$attrs"
+    draggable="false"
+  />
 </template>
 
 <style lang="scss" scoped>
