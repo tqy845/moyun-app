@@ -25,6 +25,8 @@ const Api = {
   SearchFolder: (id: number, keyword: string) => `${BASE_URL}/dir/${id}/search?keyword=${keyword}`
 }
 
+const EventSources = new WeakMap<any, EventSource>()
+
 export function getAsideMenu() {
   return request.get<{ menus: Array<AsideMenuModel> }>(Api.AsideMenu)
 }
@@ -82,35 +84,38 @@ export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) =
 }
 
 
-let searchFolderEventSource: EventSource | null = null
 export const sseSearchFolder = (folderId: number, keyword: string, callback: (data: { files: Array<FileRawModel> }) => void) => {
-  if (searchFolderEventSource) searchFolderEventSource.close()
+  // 注销上一个事件
+  EventSources.get(callback)?.close()
+  // 注册新事件
   return new Promise<FetchResponse<{ files: Array<FileRawModel> }>>((resolve, reject) => {
     const userStore = useUserStore()
-    searchFolderEventSource = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword), {
+    const connect = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword), {
       headers: {
         'Authorization': `Bearer ${userStore.token}`
       }
     })
+    // 缓存事件
+    EventSources.set(callback, connect)
     // 文件搜索
-    searchFolderEventSource.addEventListener(`content`, (event) => {
+    connect.addEventListener(`content`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
       console.log("成功", result);
       callback?.(result.data!)
     })
     // 完成
-    searchFolderEventSource.addEventListener(`complete`, (event) => {
+    connect.addEventListener(`complete`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
-      searchFolderEventSource?.close()
+      connect?.close()
       resolve(result)
     })
     // 失败
-    searchFolderEventSource.addEventListener(`error`, (event) => {
+    connect.addEventListener(`error`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
-      searchFolderEventSource?.close()
+      connect?.close()
       reject(result)
     })
   })
