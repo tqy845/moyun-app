@@ -7,7 +7,7 @@ import { useDirStore, useFileMapStore, useSettingStore } from '@/stores'
 import Base from '@/models/File/Base.ts'
 import { cloneDeep } from 'lodash'
 import { postCopyFile, postCutFile } from '@/api/file'
-import { postCopyFolder, postCutFolder } from '@/api/dir'
+import { sseCopyFolder, postCutFolder } from '@/api/dir'
 
 export type AggregateFile = (File & any) | (Folder & any)
 
@@ -149,8 +149,11 @@ export const usePathStore = defineStore(
           }
           newFile.parentId = targetDirId;
 
-          const fn = file.isFolder ? postCopyFolder : postCopyFile;
-          const copyPromise = fn(file.id, { newName: newFile.name, targetDirId });
+          const fn = file.isFolder ? sseCopyFolder : postCopyFile;
+          const copyPromise = fn(file.id, { newName: newFile.name, targetDirId }, (progress: number) => {
+            console.log("progress = ", progress);
+
+          });
           promises.push(copyPromise.then(({ fail, data }) => {
             if (!fail) {
               newFile.id = data.id;

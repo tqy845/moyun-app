@@ -14,7 +14,7 @@ const Api = {
   QuickById: (id: number) => `/dir/${id}/quick`,
   PutFixedQuickFolder: (folderId: number) => `/dir/${folderId}/folder/fixed/quick`,
   RenameFolderName: (folderId: number) => `/dir/${folderId}/folder/name`,
-  CopyFolder: (folderId: number) => `/dir/${folderId}/folder/copy`,
+  CopyFolder: (folderId: number, options: Record<string, string>) => `${BASE_URL}/dir/${folderId}/folder/copy?` + new URLSearchParams(options).toString(),
   CutFolder: (folderId: number) => `/dir/${folderId}/folder/cut`,
   RemoveFolder: (folderId: number) => `/dir/${folderId}/folder`,
   Remove: (id: number) => `/dir/${id}`,
@@ -55,11 +55,37 @@ export const getDirList = (dirId: number, params: QueryDirectoryModel) => {
   })
 }
 
-export const postCopyFolder = (folderId: number, options: FolderCopyOptionModel) => {
-  return request.post<FetchResponse<any>>(Api.CopyFolder(folderId), {
-    body: options
-  }, {
-    isTransformResponse: false
+export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, callback: (data: { files: Array<FileRawModel> }) => void) => {
+  // 注销上一个事件
+  EventSources.get(callback)?.close()
+  // 注册新事件
+  return new Promise<FetchResponse<{ files: Array<FileRawModel> }>>((resolve, reject) => {
+    const userStore = useUserStore()
+    const connect = new EventSourcePolyfill(Api.CopyFolder(folderId, options), {
+      headers: {
+        'Authorization': `Bearer ${userStore.token}`
+      }
+    })
+    // 缓存事件
+    EventSources.set(callback, connect)
+    connect.addEventListener(`progress`, (event) => {
+      const { data } = event as MessageEvent
+      const result = JSON.parse(data) as FetchResponse<{ progress:number }>
+      console.log("成功", result.data);
+      // callback?.(result.data!)
+    })
+    connect.addEventListener(`complete`, (event) => {
+      const { data } = event as MessageEvent
+      const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
+      connect?.close()
+      resolve(result)
+    })
+    connect.addEventListener(`error`, (event) => {
+      const { data } = event as MessageEvent
+      const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
+      connect?.close()
+      reject(result)
+    })
   })
 }
 
@@ -82,7 +108,6 @@ export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) =
     isTransformResponse: false
   })
 }
-
 
 export const sseSearchFolder = (folderId: number, keyword: string, callback: (data: { files: Array<FileRawModel> }) => void) => {
   // 注销上一个事件
