@@ -158,7 +158,7 @@ function useFile() {
       // 中断上传任务
       uploadAborted = true
       // 中断所有上传请求
-      request.fetchCanceler.removePendingByKey(sha256)
+      request.fetchCanceler?.removePendingByKey(sha256)
       // request.fetchCanceler.removePendingByKey(`moyun-bucket`)
       workers.forEach((worker) => worker.terminate()) // 中断所有子线程
     }

@@ -51,7 +51,7 @@ export default class Dir {
 
     // 初始化
     currentDirFiles.value.clear()
-    currentActionFiles.value.clear()
+    // currentActionFiles.value.clear()
     currentDirSelectedFiles.value.clear()
 
     const { sort } = usePathStore()

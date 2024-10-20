@@ -123,7 +123,7 @@ onUpdated(updated)
           />
 
           <t-progress
-            v-if="file.isDownloading"
+            v-if="file.progress"
             :percentage="parseFloat((file.progress as unknown as number).toFixed(2))"
             :size="fileSize"
             :strokeWidth="fileSize / 9"

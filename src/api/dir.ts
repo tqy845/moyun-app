@@ -55,24 +55,36 @@ export const getDirList = (dirId: number, params: QueryDirectoryModel) => {
   })
 }
 
-export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, callback: (data: { files: Array<FileRawModel> }) => void) => {
+export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, callback: (data: any) => void) => {
   // 注销上一个事件
   EventSources.get(callback)?.close()
   // 注册新事件
   return new Promise<FetchResponse<{ files: Array<FileRawModel> }>>((resolve, reject) => {
     const userStore = useUserStore()
-    const connect = new EventSourcePolyfill(Api.CopyFolder(folderId, options), {
+    const connect = new EventSourcePolyfill(Api.CopyFolder(folderId, options as unknown as Record<string, string>), {
       headers: {
         'Authorization': `Bearer ${userStore.token}`
       }
     })
     // 缓存事件
     EventSources.set(callback, connect)
+    connect.addEventListener(`start`, (event) => {
+      const { data } = event as MessageEvent
+      const result = JSON.parse(data) as FetchResponse<{ progress: number }>
+      console.log("start成功", result.data);
+      callback?.({
+        type: 'start',
+        data: result.data!
+      })
+    })
     connect.addEventListener(`progress`, (event) => {
       const { data } = event as MessageEvent
-      const result = JSON.parse(data) as FetchResponse<{ progress:number }>
-      console.log("成功", result.data);
-      // callback?.(result.data!)
+      const result = JSON.parse(data) as FetchResponse<{ progress: number }>
+      console.log("progress成功", result.data);
+      callback?.({
+        type: 'progress',
+        data: result.data!
+      })
     })
     connect.addEventListener(`complete`, (event) => {
       const { data } = event as MessageEvent

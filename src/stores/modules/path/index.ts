@@ -142,16 +142,28 @@ export const usePathStore = defineStore(
         // 复制操作
         if (file.isCopying) {
           const targetDirId = currentDir.value.id;
-          if (oldFile) {
-            const baseName = `${newFile.notExtName} - 副本`;
-            // xxx - 副本，xxx - 副本(2)，xxx - 副本(3) ...
-            newFile.name = fileUtils.generateNewName(baseName, newFile);
-          }
+          // if (oldFile) {
+          //   const baseName = `${newFile.notExtName} - 副本`;
+          //   // xxx - 副本，xxx - 副本(2)，xxx - 副本(3) ...
+          //   newFile.name = fileUtils.generateNewName(baseName, newFile);
+          // }
           newFile.parentId = targetDirId;
 
           const fn = file.isFolder ? sseCopyFolder : postCopyFile;
-          const copyPromise = fn(file.id, { newName: newFile.name, targetDirId }, (progress: number) => {
-            console.log("progress = ", progress);
+          const copyPromise = fn(file.id, { newName: newFile.name, targetDirId }, ({ type, data }: any) => {
+            console.log("type = ", type);
+            switch (type) {
+              case "start":
+                const { name } = data
+                newFile.name = name
+                // 将新文件添加到当前目录文件列表
+                currentDirFiles.value.push(newFile);
+                break
+              case "progress":
+                const { progress } = data
+                newFile.progress = progress !== 100 ? progress : 0
+                break
+            }
 
           });
           promises.push(copyPromise.then(({ fail, data }) => {
@@ -159,9 +171,6 @@ export const usePathStore = defineStore(
               newFile.id = data.id;
             }
           }));
-
-          // 将新文件添加到当前目录文件列表
-          currentDirFiles.value.push(newFile);
         }
       }
 
