@@ -51,7 +51,6 @@ onMounted(executed)
 
 // 监听setting变化
 settingStore.$subscribe(settingUpdate)
-
 </script>
 <template>
   <t-layout
@@ -61,7 +60,6 @@ settingStore.$subscribe(settingUpdate)
     @dragleave="dragleaveEvent"
     @dragover="dragoverEvent"
     @drop="dropEvent"
-
   >
     <t-header class="!bg-transparent" height="auto" style="">
       <TheHeader />
@@ -85,7 +83,8 @@ settingStore.$subscribe(settingUpdate)
         <TheProfile :visible="userStore.profile" @close="userStore.profile = false" />
         <!--  选择文件夹组件-->
         <TheSelectFolder />
-   
+        <!-- 文件操作 -->
+        <TheCopyHint />
       </t-content>
     </t-layout>
   </t-layout>

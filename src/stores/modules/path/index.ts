@@ -3,7 +3,7 @@ import Dir from '@/models/File/Dir'
 import Folder from '@/models/File/Folder'
 import File from '@/models/File/File'
 import { fileUtils } from '@/utils/functions'
-import { useDirStore, useFileMapStore, useSettingStore } from '@/stores'
+import { useDirStore, useFileMapStore, useFileStore, useSettingStore } from '@/stores'
 import Base from '@/models/File/Base.ts'
 import { cloneDeep } from 'lodash'
 import { postCopyFile, postCutFile } from '@/api/file'
@@ -28,12 +28,11 @@ export const usePathStore = defineStore(
     const isSearchMode = ref(false)
     const { getItemById } = useFileMapStore()
 
-
     const isSelected = (file: File | Folder) => {
       return currentDirSelectedFiles.value.includes(file)
     }
     const clearSelected = () => {
-      console.log("触发");
+      console.log('触发')
 
       currentDirSelectedFiles.value.length = 0
     }
@@ -48,7 +47,9 @@ export const usePathStore = defineStore(
       }
     }
     const removeSelected = (fileRaw: Base) => {
-      const index = currentDirSelectedFiles.value.findIndex((_file: File | Folder) => !(fileRaw.hash === _file.hash))
+      const index = currentDirSelectedFiles.value.findIndex(
+        (_file: File | Folder) => !(fileRaw.hash === _file.hash)
+      )
       if (index !== -1) {
         currentDirSelectedFiles.value.splice(index, 1)
       }
@@ -91,7 +92,7 @@ export const usePathStore = defineStore(
 
     /**
      *  排序
-     * 
+     *
      * @param type - 排序类型，默认为文件夹在前
      * @param mode - 排序模式，默认为升序
      */
@@ -108,20 +109,22 @@ export const usePathStore = defineStore(
      * 粘贴文件
      */
     const paste = async () => {
-      const promises = [];
-      let isCutAction = false;
+      const promises = []
+      let isCutAction = false
 
       for (let i = 0; i < currentActionFiles.value.length; i++) {
-        const file = currentActionFiles.value[i];
-        const newFile = cloneDeep(file);
-        newFile.isCutting = false;
-        newFile.isCopying = false;
+        const file = currentActionFiles.value[i]
+        const newFile = cloneDeep(file)
+        newFile.isCutting = false
+        newFile.isCopying = false
 
-        const oldFile = currentDirFiles.value.find(_file => _file.name === file.name && _file.type === file.type);
+        const oldFile = currentDirFiles.value.find(
+          (_file) => _file.name === file.name && _file.type === file.type
+        )
 
         // 剪切操作
         if (file.isCutting) {
-          isCutAction = true;
+          isCutAction = true
           if (oldFile) {
             const confirmDia = DialogPlugin({
               header: '源文件名和目标文件名相同',
@@ -129,53 +132,62 @@ export const usePathStore = defineStore(
               confirmBtn: '确认',
               cancelBtn: null,
               onConfirm: () => {
-                confirmDia.hide();
-              },
-            });
-            continue; // 文件重名时跳过操作，避免继续执行
+                confirmDia.hide()
+              }
+            })
+            continue // 文件重名时跳过操作，避免继续执行
           }
 
-          const fn = file.isFolder ? postCutFolder : postCutFile;
-          promises.push(fn(file.id, currentDir.value.id)); // 收集异步操作
+          const fn = file.isFolder ? postCutFolder : postCutFile
+          promises.push(fn(file.id, currentDir.value.id)) // 收集异步操作
         }
 
         // 复制操作
         if (file.isCopying) {
-          const targetDirId = currentDir.value.id;
-          // if (oldFile) {
-          //   const baseName = `${newFile.notExtName} - 副本`;
-          //   // xxx - 副本，xxx - 副本(2)，xxx - 副本(3) ...
-          //   newFile.name = fileUtils.generateNewName(baseName, newFile);
-          // }
-          newFile.parentId = targetDirId;
+          const { switchCopyHint } = useFileStore()
+          const { copyOptionsRef } = storeToRefs(useFileStore())
+          const targetDirId = currentDir.value.id
+          newFile.parentId = targetDirId
 
-          const fn = file.isFolder ? sseCopyFolder : postCopyFile;
-          const copyPromise = fn(file.id, { newName: newFile.name, targetDirId }, ({ type, data }: any) => {
-            console.log("type = ", type);
-            switch (type) {
-              case "start":
-                const { name } = data
-                newFile.name = name
-                // 将新文件添加到当前目录文件列表
-                currentDirFiles.value.push(newFile);
-                break
-              case "progress":
-                const { progress } = data
-                newFile.progress = progress !== 100 ? progress : 0
-                break
+          const fn = file.isFolder ? sseCopyFolder : postCopyFile
+          const copyPromise = fn(
+            file.id,
+            { newName: newFile.name, targetDirId },
+            ({ type, data }: any) => {
+              console.log('type = ', type)
+              switch (type) {
+                case 'start':
+                  const { name , totalNumber} = data
+                  newFile.name = name
+                  copyOptionsRef.value.totalNumber = totalNumber
+                  break
+                case 'progress':
+                  const { progress } = data
+                  copyOptionsRef.value.progress = progress
+                  if (progress == 100) {
+                    switchCopyHint(false)
+                    // newFile.progress = 0
+                  }
+                  break
+              }
             }
+          )
+          promises.push(
+            copyPromise.then(({ fail, data }) => {
+              if (!fail) {
+                newFile.id = data.id
+              }
+            })
+          )
 
-          });
-          promises.push(copyPromise.then(({ fail, data }) => {
-            if (!fail) {
-              newFile.id = data.id;
-            }
-          }));
+          // 将新文件添加到当前目录文件列表
+          currentDirFiles.value.push(newFile)
+          switchCopyHint(true)
         }
       }
 
       // 等待所有异步操作完成
-      await Promise.all(promises);
+      await Promise.all(promises)
 
       // 如果有剪切操作，清空粘贴文件
       if (isCutAction) {

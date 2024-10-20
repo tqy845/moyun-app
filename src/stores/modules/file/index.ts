@@ -10,8 +10,16 @@ export enum UploadEventFromEnum {
   inside = 'inside'
 }
 
+const copyOptions = () => ({
+  totalNumber: 0,
+  progress: 0,
+  name: ""
+})
+
 export const useFileStore = defineStore(`file-store`, () => {
   const uploadRef = ref<HTMLInputElement | null>(null)
+  const copyVisibleRef = ref(false)
+  const copyOptionsRef = ref(copyOptions())
   const _isShowUploadArea = ref(false)
   const mode = ref(MoYunModeEnum.MEDIUM_ICON)
   const { currentDir } = storeToRefs(usePathStore())
@@ -37,6 +45,19 @@ export const useFileStore = defineStore(`file-store`, () => {
     _isShowUploadArea.value = false
   }
 
+  const switchCopyHint = async (status: boolean) => {
+    await nextTick()
+    const fn = () => {
+      copyVisibleRef.value = status
+      Object.assign(copyOptionsRef.value, copyOptions())
+    }
+    if (!status) {
+      setTimeout(fn, 500)
+      return
+    }
+    fn()
+  }
+
   const createFolder = async () => {
     const { file } = await postNewFolder(currentDir.value.id)
     const fileInstance: Folder | MYFile = await currentDir.value.appendFile(file, false)
@@ -55,6 +76,10 @@ export const useFileStore = defineStore(`file-store`, () => {
     showUploadArea,
     hideUploadArea,
     createFolder,
-    createDocument
+    createDocument,
+
+    copyVisibleRef,
+    copyOptionsRef,
+    switchCopyHint
   }
 })
