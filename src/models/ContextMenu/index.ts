@@ -172,6 +172,7 @@ export class ContextMenu {
             name,
             value: 'fixed-quick',
             icon: `pin`,
+            prefixIcon: `pin`,
             color,
             action: () => {
                 const { currentDirSelectedFiles } = usePathStore()
@@ -256,7 +257,7 @@ export class ContextMenu {
             type,
             name,
             value: 'reverse',
-            prefixIcon: `redo`,
+            prefixIcon: `rollfront`,
             color,
             action: () => {
                 const { reverseSelected } = usePathStore()

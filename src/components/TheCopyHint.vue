@@ -8,6 +8,8 @@ const { copyVisibleRef, copyOptionsRef } = storeToRefs(useFileStore())
   <transition name="active">
     <div class="pos-fixed left-5 top-5" v-if="copyVisibleRef">
       <t-notification
+        v-for="i in 1"
+        :key="i"
         theme="info"
         :title="`正在复制文件`"
         :duration="0"
