@@ -31,9 +31,8 @@ export const usePathStore = defineStore(
     const isSelected = (file: File | Folder) => {
       return currentDirSelectedFiles.value.includes(file)
     }
-    const clearSelected = () => {
-      console.log('触发')
-
+    const clearSelected = () => {console.warn("123");
+    
       currentDirSelectedFiles.value.length = 0
     }
     const addSelected = (...file: Array<File | Folder>) => {

@@ -219,7 +219,6 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <!-- {{ currentDirSelectedFiles }} -->
   <div
     ref="containerRef"
     class="h-full w-full pa-1 overflow-y-hidden"

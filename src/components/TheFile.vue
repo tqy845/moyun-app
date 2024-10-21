@@ -57,6 +57,9 @@ const eventSelected = () => {
 }
 
 const eventContextmenu = () => {
+  if (currentDirSelectedFiles.value.find(it=>it === props.file)) {
+    return
+  }
   clearSelected()
   addSelected(props.file)
 }
@@ -84,7 +87,6 @@ onUpdated(updated)
 
 <template>
   <t-card
-    
     :bordered="false"
     :class="[selectedStyles]"
     :style="{ '--file-container-width': `${fileSize}px` }"

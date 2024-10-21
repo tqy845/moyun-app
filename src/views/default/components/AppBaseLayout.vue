@@ -11,6 +11,7 @@ defineProps({
 })
 
 const selectedFile = ref<File | Folder>()
+
 </script>
 
 <template>
