@@ -16,7 +16,6 @@ const Api = {
   CopyFolder: (folderId: number) => `${BASE_URL}/dir/${folderId}/folder/copy`,
   CutFolder: (folderId: number) => `/dir/${folderId}/folder/cut`,
   RemoveFolder: (folderId: number) => `/dir/${folderId}/folder`,
-  Remove: (folderId: number) => `/dir/${folderId}`,
   GetFileList: (folderId: number) => `/dir/${folderId}`,
   GetDirList: (folderId: number) => `/dir/${folderId}/list`,
   GetPhotoList: (folderId: number) => `/dir/photo/${folderId}/list`,
@@ -206,8 +205,3 @@ export const putRemoveFolder = (folderId: number) => {
   )
 }
 
-export const getDustbinList = (dirId: number, params: QueryDirectoryModel) => {
-  return request.get<{ files: Array<FileRawModel> }>(Api.GetFileList(dirId), {
-    params
-  })
-}

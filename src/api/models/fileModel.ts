@@ -29,9 +29,6 @@ export interface BuildFileUploadResultModel {
   thumbnailUrl?: string
 }
 
-export interface FileChunkModel {
-  file: FormData
-}
 
 export interface FileChunkUploaded {
   chunkName: string

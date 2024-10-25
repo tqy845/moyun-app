@@ -1,5 +1,7 @@
-import MYFile from '@/models/File/File.ts'
-import Folder from '@/models/File/Folder.ts'
+import MYFile from '@/models/File/File'
+import Folder from '@/models/File/Folder'
 
 
 export type MYF = MYFile | Folder
+
+

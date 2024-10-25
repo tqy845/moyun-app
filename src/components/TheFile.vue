@@ -4,7 +4,7 @@ import { fileUtils } from '@/utils/functions'
 import { vOnClickOutside } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
 import { ComponentPublicInstance } from 'vue'
-import type { MYF } from '@/models/File'
+import { MYF } from '@/models/File'
 
 const props = defineProps<{
   file: MYF,

@@ -14,6 +14,7 @@ import { DialogPlugin } from 'tdesign-vue-next'
 import { FetchResponse } from '@/utils/request/utils'
 import { invoke } from '@tauri-apps/api/core'
 import FetchCanceler from '@/utils/request/FetchCancel'
+import { FileRawModel } from '@/api/models/fileModel.ts'
 
 const CHUNK_SIZE = 5 * 1024 * 1024
 
@@ -204,7 +205,7 @@ function useFile() {
       worker.postMessage({ chunk, chunkName, url, formData, index })
     }
 
-    const event = new Promise((resolve, reject) => {
+    const event = new Promise<FileRawModel>((resolve, reject) => {
       for (let i = 0; i < maxConcurrentUploads; i++) {
         if (i >= chunks) return
         const worker = new Worker(workerScriptUrl, {
