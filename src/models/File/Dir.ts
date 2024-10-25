@@ -46,12 +46,11 @@ export default class Dir {
    */
   readDir = async () => {
     const fileMapStore = useFileMapStore()
-    const { isLoading, currentDirFiles, currentActionFiles, currentDirSelectedFiles } = storeToRefs(usePathStore())
+    const { isLoading, currentDirFiles, currentDirSelectedFiles } = storeToRefs(usePathStore())
     isLoading.value = true
 
     // 初始化
     currentDirFiles.value.clear()
-    // currentActionFiles.value.clear()
     currentDirSelectedFiles.value.clear()
 
     const { sort } = usePathStore()

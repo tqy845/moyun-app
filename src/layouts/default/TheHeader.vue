@@ -150,7 +150,7 @@ onUpdated(executed)
         style="all: unset; border: none"
         @blur="switchPathType('could')"
         @change="handleEditPath"
-        @enter="pathJump"
+        @enter="($event) => pathJump($event)"
       >
       </t-input>
 

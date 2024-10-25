@@ -10,7 +10,6 @@ const BASE_URL = import.meta.env.VITE_APP_BASE_API
 const Api = {
   NewFolder: (parentId: number) => `/dir/${parentId}`,
   AsideMenu: `/dir/menu/aside/list`,
-  QuickById: (folderId: number) => `/dir/${folderId}/quick`,
   GetPathJump: (folderId: number) => `/dir/${folderId}/jump`,
   PutFixedQuickFolder: (folderId: number) => `/dir/${folderId}/folder/fixed/quick`,
   RenameFolderName: (folderId: number) => `/dir/${folderId}/folder/name`,
@@ -18,12 +17,12 @@ const Api = {
   CutFolder: (folderId: number) => `/dir/${folderId}/folder/cut`,
   RemoveFolder: (folderId: number) => `/dir/${folderId}/folder`,
   Remove: (folderId: number) => `/dir/${folderId}`,
-  GetById: (folderId: number) => `/dir/${folderId}`,
   GetFileList: (folderId: number) => `/dir/${folderId}`,
   GetDirList: (folderId: number) => `/dir/${folderId}/list`,
-  GetPhotoList: (folderId: number) => `/dir/photo/${folderId}/list`,
   SearchFolder: (folderId: number, keyword: string) =>
-    `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`
+    `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`,
+  GetPhotoList: (folderId: number) => `/dir/photo/${folderId}/list`,
+  GetDustbinList: (folderId: number) => `/dir/dustbin/${folderId}/list`
 }
 
 const EventSources = new WeakMap<any, EventSource>()
@@ -182,19 +181,11 @@ export const getPathJump = (folderId: number, path: string) => {
   })
 }
 
-export function getById<T>(id: number) {
-  return request.get<T>(Api.GetById(id), {})
-}
-
-export function putQuickById<T>(id: number) {
-  return request.get<T>(Api.QuickById(id), {})
-}
-
-export function postNewFolder(parentId: number) {
+export const postNewFolder = (parentId: number) => {
   return request.post<{ file: FileRawModel }>(Api.NewFolder(parentId))
 }
 
-export function putRenameFolderName(folderId: number, body: { name: string }) {
+export const putRenameFolderName = (folderId: number, body: { name: string }) => {
   return request.put<FetchResponse<any>>(
     Api.RenameFolderName(folderId),
     {
@@ -206,7 +197,7 @@ export function putRenameFolderName(folderId: number, body: { name: string }) {
   )
 }
 
-export function putRemoveFolder(folderId: number) {
+export const putRemoveFolder = (folderId: number) => {
   return request.put<FetchResponse<any>>(
     Api.RemoveFolder(folderId),
     {},
@@ -214,4 +205,8 @@ export function putRemoveFolder(folderId: number) {
       isTransformResponse: false
     }
   )
+}
+
+export const getDustbinList = (folderId: number) => {
+  return request.get<{ files: Array<FileRawModel> }>(Api.GetDustbinList(folderId))
 }

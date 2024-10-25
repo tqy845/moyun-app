@@ -1,18 +1,19 @@
 <script lang="ts" setup>
 import { useDirStore, useSettingStore } from '@/stores'
 import { MoYunAssembleEnum } from '@/constants'
+import {DropdownOption} from "tdesign-vue-next";
 
 const { switchFolderSelect, readPhotoAlbum } = useDirStore()
 const { photoAlbumAssembleOptions, photoAlbumParentId, currentSelectedPhotoAlbum } =
   storeToRefs(useSettingStore())
 
-const eventToggle = async (item: unknown) => {
-  if (item.value === MoYunAssembleEnum.CUSTOM) {
+const eventToggle = async ({ value }: DropdownOption) => {
+  if (value === MoYunAssembleEnum.CUSTOM) {
     // 选择目录
     switchFolderSelect(true)
     return
   }
-  photoAlbumParentId.value = item.value
+  photoAlbumParentId.value = value as MoYunAssembleEnum
   await readPhotoAlbum()
 }
 </script>

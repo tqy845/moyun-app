@@ -1,4 +1,4 @@
-import { getAsideMenu, getPhotoList } from '@/api/dir'
+import { getAsideMenu, getDustbinList, getPhotoList } from '@/api/dir'
 import Folder from '@/models/File/Folder'
 import { AsideMenuType } from './helper'
 import { FileExtensionEnum, FileLevelEnum, GroupEnum, MoYunAssembleEnum } from '@/constants'
@@ -20,6 +20,7 @@ export const useDirStore = defineStore(
     )
     const folderSelect = ref(false)
     const { photoAlbumParentId } = storeToRefs(useSettingStore())
+    const { currentDir } = storeToRefs(usePathStore())
     const isBaseLayout = computed(() => asideMenuObjectCurrentIndexItem.value.name !== '图库')
     const isDrag = ref(false)
 
@@ -82,7 +83,11 @@ export const useDirStore = defineStore(
     /**
      * 读取回收站
      */
-    const readDustbin = async () => {}
+    const readDustbin = async () => {
+      console.log('读取')
+      const { files } = await getDustbinList(currentDir.value.id)
+      console.log(`files = `, files)
+    }
 
     const switchFolderSelect = (status: boolean) => {
       folderSelect.value = status
