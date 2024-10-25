@@ -8,12 +8,12 @@ import {
 } from '@/api/file'
 import type { UploadFile } from '@/constants'
 import Base from '@/models/File/Base'
-import { request } from '@/utils/request'
 import MYFile from '@/models/File/File'
 import { exists } from '@tauri-apps/plugin-fs'
 import { DialogPlugin } from 'tdesign-vue-next'
 import { FetchResponse } from '@/utils/request/utils'
 import { invoke } from '@tauri-apps/api/core'
+import FetchCanceler from '@/utils/request/FetchCancel'
 
 const CHUNK_SIZE = 5 * 1024 * 1024
 
@@ -158,7 +158,7 @@ function useFile() {
       // 中断上传任务
       uploadAborted = true
       // 中断所有上传请求
-      request.fetchCanceler?.removePendingByKey(sha256)
+      FetchCanceler.removePendingByKey(sha256)
       // request.fetchCanceler.removePendingByKey(`moyun-bucket`)
       workers.forEach((worker) => worker.terminate()) // 中断所有子线程
     }
@@ -279,7 +279,7 @@ function useFile() {
       return postBuildDownloadTask({
         filename: file.name,
         hash: file.hash,
-        parentId: currentDir.id
+        parentId: currentDir!.id
       })
     }
 

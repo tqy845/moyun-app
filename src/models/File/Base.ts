@@ -19,14 +19,15 @@ export default class Base {
   public updatedAt?: string
   public deletedAt?: string
 
-  public isDownloading = ref(false)
-  public isCutting = ref(false)
-  public isCopying = ref(false)
-  public isRenaming = ref(false)
+  public isDownloading = false
+  public isCutting = false
+  public isCopying = false
+  public isRenaming = false
   // 进度条
-  public progress = ref(0)
+  public progress = 0
   // 绑定元素
   public el: Element | null = null
+
   /**
    * 构造方法
    */
@@ -45,8 +46,12 @@ export default class Base {
     return Object.is(this.extension, FileExtensionEnum.FOLDER)
   }
 
-  get typeName() {
+  get type() {
     return this.isFolder ? '文件夹' : `${this.extension} 文件`
+  }
+
+  setEl(el: Element) {
+    this.el = el
   }
 
   /**
@@ -68,15 +73,14 @@ export default class Base {
   /**
    * 分享此文件/文件夹
    */
-  shear = async () => { }
+  shear = async () => {
+  }
 
   /**
    * 复制此文件/文件夹
    */
   copy = async () => {
-    console.log(1);
-
-    this.isCopying.value = false
+    this.isCopying = false
   }
 
   /**
@@ -93,14 +97,15 @@ export default class Base {
       }
     } finally {
       await nextTick()
-      this.isRenaming.value = false
+      this.isRenaming = false
     }
   }
 
   /**
    * 同步此文件/文件夹
    */
-  sync = async () => { }
+  sync = async () => {
+  }
 
   /**
    * 删除此文件/文件夹
@@ -110,8 +115,8 @@ export default class Base {
       const { fail } = await (this.isFolder ? putRemoveFolder(this.id) : putRemoveFile(this.id))
       if (!fail) {
         // 从目录中删除
-        const { removeCurrentDirFile, currentActionFiles } = usePathStore()
-        console.log("删除成功", this);
+        const { removeCurrentDirFile } = usePathStore()
+        console.log('删除成功', this)
         removeCurrentDirFile(this)
         // 从快速访问中删除
       }
@@ -131,9 +136,3 @@ export default class Base {
     appendDownloadTask(this)
   }
 }
-
-export type NonMethodKeys<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any ? never : K
-}[keyof T]
-
-export type NonMethodProperties<T> = Pick<T, NonMethodKeys<T>>

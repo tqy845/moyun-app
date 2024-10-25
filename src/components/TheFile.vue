@@ -1,22 +1,15 @@
 <script lang="tsx" setup>
-import File from '@/models/File/File'
-import Folder from '@/models/File/Folder'
 import { usePathStore, useSettingStore } from '@/stores'
 import { fileUtils } from '@/utils/functions'
 import { vOnClickOutside } from '@vueuse/components'
 import { useDateFormat } from '@vueuse/core'
 import { ComponentPublicInstance } from 'vue'
+import type { MYF } from '@/models/File'
 
-const props = defineProps({
-  file: {
-    type: Object as PropType<File | Folder>,
-    required: true
-  },
-  showName: {
-    type: Boolean,
-    default: true
-  }
-})
+const props = defineProps<{
+  file: MYF,
+  showName: boolean
+}>()
 
 const controlState = useKeyModifier('Control')
 const shiftState = useKeyModifier('Shift')
@@ -45,11 +38,11 @@ const eventSelected = () => {
     if (preFile) {
       let startIndex = currentDirFiles.value.findIndex((file) => file === preFile)
       let endIndex = currentDirFiles.value.findIndex(
-        (file) => (file as unknown as File | Folder) === props.file
+        (file) => (file as unknown as MYF) === props.file
       )
       startIndex > endIndex ? ([endIndex, startIndex] = [startIndex, endIndex]) : null
       const range = currentDirFiles.value.slice(startIndex, endIndex + 1) as unknown as Array<
-        File | Folder
+        MYF
       >
       addSelected(...range)
     }
@@ -57,7 +50,7 @@ const eventSelected = () => {
 }
 
 const eventContextmenu = () => {
-  if (currentDirSelectedFiles.value.find(it=>it === props.file)) {
+  if (currentDirSelectedFiles.value.find(it => it === props.file)) {
     return
   }
   clearSelected()
@@ -82,6 +75,13 @@ const selectedStyles = computed(() => {
   return isSelected(props.file) ? 'selected' : ''
 })
 
+const handleSetRef = (ref: ComponentPublicInstance) => {
+  props.file.setEl(ref?.$el)
+}
+
+console.log(`file.notExtName = `, props.file.isRenaming)
+
+
 onUpdated(updated)
 </script>
 
@@ -94,7 +94,7 @@ onUpdated(updated)
     @click="eventSelected"
     @contextmenu="eventContextmenu"
     :data-id="file.id"
-    :ref="(ref) => (file.el = (ref as ComponentPublicInstance)?.$el)"
+    :ref="handleSetRef"
   >
     <t-popup :delay="[1300, 0]" placement="bottom-left" showArrow>
       <!-- 扩展提示 -->
@@ -103,12 +103,12 @@ onUpdated(updated)
           <t-row><span class="text-small">名称：</span>{{ file.name }}</t-row>
           <t-row><span class="text-small">类型：</span>{{ file.typeName }}</t-row>
           <t-row
-            ><span class="text-small font-bold">大小：</span
-            >{{ fileUtils.formatFileSize(file.size || 0) }}
+          ><span class="text-small font-bold">大小：</span
+          >{{ fileUtils.formatFileSize(file.size || 0) }}
           </t-row>
           <t-row
-            ><span class="text-small font-bold">修改日期：</span
-            >{{ useDateFormat(file.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
+          ><span class="text-small font-bold">修改日期：</span
+          >{{ useDateFormat(file.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
           </t-row>
         </div>
       </template>
@@ -126,7 +126,7 @@ onUpdated(updated)
 
           <t-progress
             v-if="file.progress"
-            :percentage="parseFloat((file.progress as unknown as number).toFixed(2))"
+            :percentage="parseFloat((file.progress).toFixed(2))"
             :size="fileSize"
             :strokeWidth="fileSize / 9"
             class="position-absolute"

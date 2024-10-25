@@ -1,16 +1,15 @@
 <script lang="ts" setup>
-import Folder from '@/models/File/Folder'
-import File from '@/models/File/File'
+import { MYF } from '@/models/File'
 
 defineProps({
-  dirFiles: Array as PropType<File[] | Folder[]>,
+  dirFiles: Array as PropType<Array<MYF>>,
   fileSize: {
     type: Number,
     default: 0
   }
 })
 
-const selectedFile = ref<File | Folder>()
+const selectedFile = ref<MYF>()
 
 </script>
 
@@ -25,6 +24,7 @@ const selectedFile = ref<File | Folder>()
       <TheContextMenu :menu="selectedFile?.getMenuItems()" @select="$event.action(selectedFile)">
         <TheFile
           :file="file"
+          :show-name="true"
           class="ma-1"
           @contextmenu="selectedFile = file"
           @click.stop="selectedFile = file"

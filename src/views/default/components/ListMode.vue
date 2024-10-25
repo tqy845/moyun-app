@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { useFileStore, useSystemStore, usePathStore, useDirStore, useFileMapStore } from '@/stores'
-import File from '@/models/File/File'
-import Folder from '@/models/File/Folder'
 import {
   ActiveChangeContext,
   RowEventContext,
@@ -11,6 +9,7 @@ import {
 } from 'tdesign-vue-next'
 import { fileUtils } from '@/utils/functions'
 import { FileExtensionEnum } from '@/constants'
+import { MYF } from '@/models/File'
 
 const tableRef = ref()
 const { isDrag } = storeToRefs(useDirStore())
@@ -28,7 +27,7 @@ const selectedRowKeys = computed(
     currentDirSelectedFiles.value.map((it) => it.name) as unknown as TableProps['selectedRowKeys']
 )
 
-const selectedFile = ref<File | Folder>()
+const selectedFile = ref<MYF>()
 
 const columns = [
   {
@@ -60,7 +59,7 @@ fileStore.$subscribe(async ({ type }: { type: string }) => {
   }
 })
 
-const eventLeftClick = (file: File | Folder) => {
+const eventLeftClick = (file: MYF) => {
   if (isSelected(file) && currentDirSelectedFiles.value.length <= 1) {
     removeSelected(file)
     return
@@ -84,12 +83,12 @@ const eventLeftClick = (file: File | Folder) => {
     const patchSelectedArray = currentDirFiles.value.slice(
       startIndex,
       endIndex + 1
-    ) as unknown as Array<File | Folder>
+    ) as unknown as Array<MYF>
     addSelected(...patchSelectedArray)
   }
 }
 
-const eventRightClick = (file: File | Folder) => {
+const eventRightClick = (file: MYF) => {
   clearSelected()
   addSelected(file)
 }
@@ -102,7 +101,7 @@ const eventRowClick = ({ e, row }: RowEventContext<TableRowData>) => {
   // e.preventDefault()
   // e.stopPropagation()
 
-  const file = row as unknown as File | Folder
+  const file = row as unknown as MYF
   selectedFile.value = file
 
   switch ((e as MouseEvent).button) {
@@ -127,7 +126,7 @@ const eventUpdateSelected = (
   { activeRowList }: ActiveChangeContext<TableRowData>
 ) => {
   clearSelected()
-  addSelected(...(activeRowList as unknown as Array<File | Folder>))
+  addSelected(...(activeRowList as unknown as Array<MYF>))
 }
 
 const eventRowAttributes = (params: TableRowAttributes<TableRowData>) => {

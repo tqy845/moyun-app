@@ -1,10 +1,4 @@
 <script lang="ts" setup>
-/*
- * 组件名: TheEllipsisPath
- * 组件用途: XXX
- * 创建日期: 2024/1/31
- * 作者: 谭期元
- */
 import { useSystemStore } from '@/stores'
 
 const systemStore = useSystemStore()
@@ -29,7 +23,7 @@ onMounted(executed)
           v-for="path in paths"
           :key="path.id"
           :value="path.id"
-          @click="systemStore.go(path)"
+          @click="path.go(path)"
         >
           {{ path.name }}
         </t-dropdown-item>

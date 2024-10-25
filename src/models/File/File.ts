@@ -1,4 +1,4 @@
-import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, FlagEnum, GroupEnum } from '@/constants'
+import { ContentMenuItem, FileExtensionEnum, FileLevelEnum, GroupEnum } from '@/constants'
 import Base from './Base'
 import { Prototype } from './interface'
 import { FileRawModel } from '@/api/models/fileModel'
@@ -46,7 +46,7 @@ export default class File extends Base {
   /**
    * 菜单项
    */
-  getMenuItems(flag?: FlagEnum) {
+  getMenuItems() {
     // 追加额外菜单
     const builder = ContextMenu.builder()
     builder.appendDownload()

@@ -6,7 +6,8 @@ const { mode } = storeToRefs(useFileStore())
 const settingStore = useSettingStore()
 
 const eventToggle = (item: unknown) => {
-  settingStore.fileSize = mode.value = (item as (typeof modeOptions)[0]).value
+  const _it = item as (typeof modeOptions)[0]
+  settingStore.fileSize = mode.value = _it.value
 }
 </script>
 
@@ -24,7 +25,7 @@ const eventToggle = (item: unknown) => {
         v-for="(item, index) in modeOptions"
         :key="index"
         :active="mode === item.value"
-        :divider="item.divider"
+        :divider="!!item.divider"
         :value="item.value"
       >
         <div class="flex items-center">

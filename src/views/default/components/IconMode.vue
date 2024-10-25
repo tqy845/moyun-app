@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { useFileStore, useSettingStore, useSystemStore, usePathStore, useDirStore } from '@/stores'
-import File from '@/models/File/File'
-import Folder from '@/models/File/Folder'
 import { useTemplateRef } from 'vue'
 import AppBaseLayout from '@/views/default/components/AppBaseLayout.vue'
 import AppFallsLayout from '@/views/default/components/AppFallsLayout.vue'
+import { MYF } from '@/models/File'
 
 const iconModeRef = useTemplateRef('iconModeRef')
 const systemStore = useSystemStore()
@@ -14,7 +13,7 @@ const { isBaseLayout } = storeToRefs(useDirStore())
 const { currentDirFiles, currentDirSelectedFiles, isLoading, isSearchMode } =
   storeToRefs(usePathStore())
 
-const dirFiles = computed(() => currentDirFiles.value as unknown as Array<File | Folder>)
+const dirFiles = computed(() => currentDirFiles.value as unknown as Array<MYF>)
 
 const { control, x, c } = useMagicKeys()
 

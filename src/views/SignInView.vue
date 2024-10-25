@@ -1,10 +1,4 @@
 <script lang="ts" setup>
-/*
- * LoginView
- * 组件用途： 登录页面
- * 创建日期： 2024/02/01
- * 作者： 谭期元
- */
 import { UserLoginModel } from '@/api/models/userModel'
 import { useUserStore } from '@/stores'
 import { getDefaultSetting, getUserEmailSuffix } from '@/stores/modules/user/helper'
@@ -13,7 +7,6 @@ import { FormProps, FormRules } from 'tdesign-vue-next'
 const formRef = ref()
 
 const route = useRoute()
-const router = useRouter()
 
 const loading = ref(false)
 const userStore = useUserStore()

@@ -1,20 +1,19 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, useTemplateRef } from 'vue'
-import File from '@/models/File/File'
-import Folder from '@/models/File/Folder'
 import { useUserStore } from '@/stores'
+import { MYF } from '@/models/File'
 
 const { endpoint } = useUserStore()
 
 defineProps({
-  dirFiles: Array as PropType<File[] | Folder[]>, // 接受 File 和 Folder 数组
+  dirFiles: Object as PropType<Array<MYF>>,
   fileSize: {
     type: Number,
     default: 0
   }
 })
 
-const selectedFile = ref<File | Folder>()
+const selectedFile = ref<MYF>()
 const masonryGrid = useTemplateRef('masonryGrid')
 
 const layoutMasonry = () => {

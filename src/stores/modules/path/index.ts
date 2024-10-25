@@ -1,26 +1,27 @@
 import { FileExtensionEnum, SortModeEnum, SortTypeEnum } from '@/constants'
 import Dir from '@/models/File/Dir'
 import Folder from '@/models/File/Folder'
-import File from '@/models/File/File'
+import MYFile from '@/models/File/File'
 import { fileUtils } from '@/utils/functions'
 import { useDirStore, useFileMapStore, useFileStore, useSettingStore } from '@/stores'
 import Base from '@/models/File/Base.ts'
 import { cloneDeep } from 'lodash'
 import { postCopyFile, postCutFile } from '@/api/file'
 import { sseCopyFolder, postCutFolder, getPathJump } from '@/api/dir'
+import { reactive, Reactive } from 'vue'
+import { MYF } from '@/models/File'
 
-export type AggregateFile = (File & any) | (Folder & any)
 
 export const usePathStore = defineStore(
   'path-store',
   () => {
-    const children = ref<Array<Dir & any>>([])
-    const currentDir = computed<AggregateFile>(() => children.value.peek())
+    const children = ref<Array<Reactive<Dir>>>([])
+    const currentDir = computed(() => children.value.peek())
     const historyChildren = ref<Array<number>>([]) // 装入目录的ID
     const isLoading = ref(false)
-    const currentDirFiles = ref<Array<AggregateFile>>([])
-    const currentDirSelectedFiles = ref<Array<AggregateFile>>([])
-    const currentActionFiles = ref<Array<AggregateFile>>([])
+    const currentDirFiles = ref<Array<MYF>>([])
+    const currentDirSelectedFiles = ref<Array<MYF>>([])
+    const currentActionFiles = ref<Array<MYF>>([])
     const { isBaseLayout, asideMenuObjectCurrentIndexItem } = storeToRefs(useDirStore())
     const { readPhotoAlbum } = useDirStore()
     const { fileSortMode, fileSortType } = storeToRefs(useSettingStore())
@@ -28,13 +29,13 @@ export const usePathStore = defineStore(
     const isSearchMode = ref(false)
     const { getItemById } = useFileMapStore()
 
-    const isSelected = (file: File | Folder) => {
+    const isSelected = (file: MYFile | Folder) => {
       return currentDirSelectedFiles.value.includes(file)
     }
     const clearSelected = () => {
       currentDirSelectedFiles.value.length = 0
     }
-    const addSelected = (...file: Array<File | Folder>) => {
+    const addSelected = (...file: Array<MYFile | Folder>) => {
       currentDirSelectedFiles.value.push(...file)
     }
     const removeCurrentDirFile = (fileRaw: Base) => {
@@ -46,7 +47,7 @@ export const usePathStore = defineStore(
     }
     const removeSelected = (fileRaw: Base) => {
       const index = currentDirSelectedFiles.value.findIndex(
-        (_file: File | Folder) => !(fileRaw.hash === _file.hash)
+        (_file: MYFile | Folder) => !(fileRaw.hash === _file.hash)
       )
       if (index !== -1) {
         currentDirSelectedFiles.value.splice(index, 1)
@@ -83,7 +84,7 @@ export const usePathStore = defineStore(
       )
       // 重新装入系统路径栈
       children.value.length = 0
-      children.value.push(...peekDirList)
+      children.value.push(...peekDirList.map(dir => reactive(dir)))
       // 清空历史路径
       peekDirArray.value.length = 0
     }
@@ -97,7 +98,7 @@ export const usePathStore = defineStore(
         // 重新实例化目录ID列表
         const dirList = dirs.map((rawDir) => new Dir(new Folder(rawDir)))
         children.value.length = 1
-        children.value.push(...dirList)
+        children.value.push(...dirList.map(dir => reactive(dir)))
       } else {
         const confirmDia = DialogPlugin({
           header: '跳转失败',
@@ -161,14 +162,14 @@ export const usePathStore = defineStore(
           }
 
           const fn = file.isFolder ? postCutFolder : postCutFile
-          promises.push(fn(file.id, currentDir.value.id)) // 收集异步操作
+          promises.push(fn(file.id, currentDir.value!.id)) // 收集异步操作
         }
 
         // 复制操作
         if (file.isCopying) {
           const { switchCopyHint } = useFileStore()
           const { copyOptionsRef } = storeToRefs(useFileStore())
-          const targetDirId = currentDir.value.id
+          const targetDirId = currentDir.value!.id
           newFile.parentId = targetDirId
 
           const fn = file.isFolder ? sseCopyFolder : postCopyFile
@@ -179,11 +180,13 @@ export const usePathStore = defineStore(
               console.log('type = ', type)
               switch (type) {
                 case 'start':
+                  // eslint-disable-next-line no-case-declarations
                   const { name, totalNumber } = data
                   newFile.name = name
                   copyOptionsRef.value.totalNumber = totalNumber
                   break
                 case 'progress':
+                  // eslint-disable-next-line no-case-declarations
                   const { progress } = data
                   copyOptionsRef.value.progress = progress
                   if (progress == 100) {

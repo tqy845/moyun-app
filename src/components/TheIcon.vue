@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { baseUtils } from '@/utils/functions'
 import { useUserStore } from '@/stores'
-import { CircleIcon } from 'tdesign-icons-vue-next'
 
 const { endpoint } = useUserStore()
 

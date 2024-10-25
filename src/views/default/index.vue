@@ -29,13 +29,6 @@ const isDragging = ref(false)
 const dragStartX = ref(0)
 const dragStartY = ref(0)
 const dragSelectionBox = ref({ top: 0, left: 0, width: 0, height: 0 })
-/**
- * 绑定鼠标滚动实现修改Mode
- */
-const eventResetSize = () => {
-  containerRef.value?.addEventListener('wheel', wheelEvent)
-  containerRef.value?.focus()
-}
 
 const wheelEvent = (event: WheelEvent) => {
   if (!focused.value) focused.value = true
@@ -46,6 +39,15 @@ const wheelEvent = (event: WheelEvent) => {
     resetMode()
   })
 }
+
+/**
+ * 绑定鼠标滚动实现修改Mode
+ */
+const eventResetSize = () => {
+  containerRef.value?.addEventListener('wheel', wheelEvent)
+  containerRef.value?.focus()
+}
+
 
 const isPhotoAlbum = computed(() => currentDir.value.rawFolder.name === '图库')
 const isDustbin = computed(() => currentDir.value.rawFolder.name === '回收站')

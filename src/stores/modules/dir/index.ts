@@ -1,23 +1,21 @@
-import { getAsideMenu, getDustbinList, getPhotoList } from '@/api/dir'
+import { getAsideMenu } from '@/api/dir'
 import Folder from '@/models/File/Folder'
-import { AsideMenuType } from './helper'
 import {
   FileExtensionEnum,
   FileLevelEnum,
   FlagEnum,
-  GroupEnum,
-  MoYunAssembleEnum
+  GroupEnum
 } from '@/constants'
-import { useFileMapStore, usePathStore, useSettingStore } from '@/stores'
-import { fileUtils } from '@/utils/functions'
+import { useFileMapStore, usePathStore } from '@/stores'
 
 export const useDirStore = defineStore(
   `dirStore`,
   () => {
     const fileMapStore = useFileMapStore()
     // 侧边菜单项
-    const asideMenuObject: Ref<AsideMenuType> = ref({
+    const asideMenuObject: Ref = ref({
       index: 0,
+      name: '',
       menus: []
     })
     const asideMenuObjectCurrentIndexItem = computed(
@@ -68,7 +66,7 @@ export const useDirStore = defineStore(
      */
     const readPhotoAlbum = async () => {
       const { children } = usePathStore()
-      return await children.peek().readDir()
+      return await children.peek()!.readDir()
     }
 
     const switchFolderSelect = (status: boolean) => {

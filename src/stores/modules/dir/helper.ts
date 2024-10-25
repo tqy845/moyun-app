@@ -1,4 +1,4 @@
-import Folder from '@/models/File/Folder.ts'
+import Folder from '@/models/File/Folder'
 
 export type AsideMenuType = {
   // 侧边菜单索引
