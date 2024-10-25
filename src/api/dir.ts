@@ -11,18 +11,19 @@ const BASE_URL = import.meta.env.VITE_APP_BASE_API
 const Api = {
   NewFolder: (parentId: number) => `/dir/${parentId}`,
   AsideMenu: `/dir/menu/aside/list`,
-  QuickById: (id: number) => `/dir/${id}/quick`,
+  QuickById: (folderId: number) => `/dir/${folderId}/quick`,
+  GetPathJump: (folderId: number) => `/dir/${folderId}/jump`,
   PutFixedQuickFolder: (folderId: number) => `/dir/${folderId}/folder/fixed/quick`,
   RenameFolderName: (folderId: number) => `/dir/${folderId}/folder/name`,
-  CopyFolder: (folderId: number, options: Record<string, string>) => `${BASE_URL}/dir/${folderId}/folder/copy?` + new URLSearchParams(options).toString(),
+  CopyFolder: (folderId: number) => `${BASE_URL}/dir/${folderId}/folder/copy`,
   CutFolder: (folderId: number) => `/dir/${folderId}/folder/cut`,
   RemoveFolder: (folderId: number) => `/dir/${folderId}/folder`,
-  Remove: (id: number) => `/dir/${id}`,
-  GetById: (id: number) => `/dir/${id}`,
-  GetFileList: (id: number) => `/dir/${id}`,
-  GetDirList: (id: number) => `/dir/${id}/list`,
-  GetPhotoList: (id: number) => `/dir/photo/${id}/list`,
-  SearchFolder: (id: number, keyword: string) => `${BASE_URL}/dir/${id}/search?keyword=${keyword}`
+  Remove: (folderId: number) => `/dir/${folderId}`,
+  GetById: (folderId: number) => `/dir/${folderId}`,
+  GetFileList: (folderId: number) => `/dir/${folderId}`,
+  GetDirList: (folderId: number) => `/dir/${folderId}/list`,
+  GetPhotoList: (folderId: number) => `/dir/photo/${folderId}/list`,
+  SearchFolder: (folderId: number, keyword: string) => `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`
 }
 
 const EventSources = new WeakMap<any, EventSource>()
@@ -61,7 +62,8 @@ export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, 
   // 注册新事件
   return new Promise<FetchResponse<{ files: Array<FileRawModel> }>>((resolve, reject) => {
     const userStore = useUserStore()
-    const connect = new EventSourcePolyfill(Api.CopyFolder(folderId, options as unknown as Record<string, string>), {
+    const querys = new URLSearchParams(options as unknown as Record<string, any>).toString()
+    const connect = new EventSourcePolyfill(Api.CopyFolder(folderId).concat(`?${querys}`), {
       headers: {
         'Authorization': `Bearer ${userStore.token}`
       }
@@ -156,6 +158,11 @@ export const sseSearchFolder = (folderId: number, keyword: string, callback: (da
       reject(result)
     })
   })
+}
+
+export const getPathJump = (folderId: number, path: string) => {
+  const querys = new URLSearchParams({ path }).toString()
+  return request.get(Api.GetPathJump(folderId).concat(`?${querys}`))
 }
 
 export function getById<T>(id: number) {
