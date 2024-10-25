@@ -3,8 +3,9 @@ import TheAside from './TheAside.vue'
 import TheHeader from './TheHeader.vue'
 import { useFileStore, useSettingStore, useSystemStore, useUserStore } from '@/stores'
 import { settingUpdate } from '@/stores/modules/setting/helper'
-import BtnUpload from './components/BtnUpload.vue'
-import TheSelectFolder from './components/TheSelectFolder.vue'
+import TheSelectFolder from '@/layouts/default/components/TheSelectFolder.vue'
+import TheFileAttr from '@/layouts/default/components/TheFileAttr.vue'
+import BtnUpload from '@/layouts/default/components/BtnUpload.vue'
 
 const contentRef = ref()
 const systemStore = useSystemStore()
@@ -85,6 +86,7 @@ settingStore.$subscribe(settingUpdate)
         <TheSelectFolder />
         <!-- 文件操作 -->
         <TheCopyHint />
+        <TheFileAttr />
       </t-content>
     </t-layout>
   </t-layout>

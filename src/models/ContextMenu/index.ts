@@ -275,8 +275,7 @@ export class ContextMenu {
             shortcutKey,
             action: (folder?: Folder) => {
                 if (folder) {
-                    folder.open()
-                    return
+                    return folder.open()
                 }
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.open())
@@ -293,8 +292,7 @@ export class ContextMenu {
             shortcutKey,
             action: (folder?: Folder) => {
                 if (folder) {
-                    folder.detail()
-                    return
+                    return folder.detail()
                 }
                 const { currentDirSelectedFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.detail())
@@ -376,8 +374,10 @@ export class ContextMenu {
             shortcutKey,
             color,
             action: () => {
-                const { currentDirSelectedFiles } = usePathStore()
+                const { currentDirSelectedFiles, currentActionFiles } = usePathStore()
                 currentDirSelectedFiles.forEach(file => file.delete())
+                currentDirSelectedFiles.clear()
+                currentActionFiles.clear()
             }
         })
         return this
@@ -390,8 +390,7 @@ export class ContextMenu {
             icon: 'paste',
             color,
             action: () => {
-                const { paste } = usePathStore()
-                paste()
+                return usePathStore().paste()
             }
         })
         return this

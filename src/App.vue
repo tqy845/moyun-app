@@ -1,12 +1,16 @@
 <script lang="ts" setup>
 // 禁用默认菜单
 window.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-});
+  e.preventDefault()
+})
+
+onMounted(() => {
+  window.document.querySelectorAll('div').forEach(it => it.setAttribute('data-tauri-drag-region', ''))
+})
 </script>
 
 <template>
-  <RouterView  />
+  <RouterView />
 </template>
 
 <style>

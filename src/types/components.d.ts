@@ -19,6 +19,8 @@ declare module 'vue' {
     TCheckbox: typeof import('tdesign-vue-next')['Checkbox']
     TCol: typeof import('tdesign-vue-next')['Col']
     TContent: typeof import('tdesign-vue-next')['Content']
+    TDescriptions: typeof import('tdesign-vue-next')['Descriptions']
+    TDescriptionsItem: typeof import('tdesign-vue-next')['DescriptionsItem']
     TDialog: typeof import('tdesign-vue-next')['Dialog']
     TDivider: typeof import('tdesign-vue-next')['Divider']
     TDrawer: typeof import('tdesign-vue-next')['Drawer']
@@ -62,6 +64,8 @@ declare module 'vue' {
     TSwiper: typeof import('tdesign-vue-next')['Swiper']
     TSwiperItem: typeof import('tdesign-vue-next')['SwiperItem']
     TTable: typeof import('tdesign-vue-next')['Table']
+    TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
+    TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTextarea: typeof import('tdesign-vue-next')['Textarea']
     TTree: typeof import('tdesign-vue-next')['Tree']
   }

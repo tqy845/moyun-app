@@ -1,5 +1,5 @@
 import { FileRawModel } from '@/api/models/fileModel'
-import { useDownloadStore, usePathStore } from '@/stores'
+import { useDownloadStore, useFileAttrStore, usePathStore } from '@/stores'
 import { FileExtensionEnum, FlagEnum } from '@/constants'
 import { putRemoveFolder, putRenameFolderName } from '@/api/dir'
 import { putRemoveFile, putRenameFileName } from '@/api/file'
@@ -17,7 +17,7 @@ export default class Base {
 
   public createdAt?: string
   public updatedAt?: string
-  public deleteAt?: string
+  public deletedAt?: string
 
   public isDownloading = ref(false)
   public isCutting = ref(false)
@@ -60,7 +60,10 @@ export default class Base {
   /**
    * 查看此文件/文件夹详情
    */
-  detail = async () => { }
+  detail = async () => {
+    const { show } = useFileAttrStore()
+    return show(this)
+  }
 
   /**
    * 分享此文件/文件夹
@@ -107,7 +110,8 @@ export default class Base {
       const { fail } = await (this.isFolder ? putRemoveFolder(this.id) : putRemoveFile(this.id))
       if (!fail) {
         // 从目录中删除
-        const { removeCurrentDirFile } = usePathStore()
+        const { removeCurrentDirFile, currentActionFiles } = usePathStore()
+        console.log("删除成功", this);
         removeCurrentDirFile(this)
         // 从快速访问中删除
       }
