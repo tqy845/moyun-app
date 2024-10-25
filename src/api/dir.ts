@@ -19,10 +19,9 @@ const Api = {
   Remove: (folderId: number) => `/dir/${folderId}`,
   GetFileList: (folderId: number) => `/dir/${folderId}`,
   GetDirList: (folderId: number) => `/dir/${folderId}/list`,
-  SearchFolder: (folderId: number, keyword: string) =>
-    `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`,
   GetPhotoList: (folderId: number) => `/dir/photo/${folderId}/list`,
-  GetDustbinList: (folderId: number) => `/dir/dustbin/${folderId}/list`
+  SearchFolder: (folderId: number, keyword: string) =>
+      `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`,
 }
 
 const EventSources = new WeakMap<any, EventSource>()
@@ -207,6 +206,8 @@ export const putRemoveFolder = (folderId: number) => {
   )
 }
 
-export const getDustbinList = (folderId: number) => {
-  return request.get<{ files: Array<FileRawModel> }>(Api.GetDustbinList(folderId))
+export const getDustbinList = (dirId: number, params: QueryDirectoryModel) => {
+  return request.get<{ files: Array<FileRawModel> }>(Api.GetFileList(dirId), {
+    params
+  })
 }

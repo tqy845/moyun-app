@@ -32,8 +32,6 @@ export const usePathStore = defineStore(
       return currentDirSelectedFiles.value.includes(file)
     }
     const clearSelected = () => {
-      console.warn('123')
-
       currentDirSelectedFiles.value.length = 0
     }
     const addSelected = (...file: Array<File | Folder>) => {
@@ -96,7 +94,6 @@ export const usePathStore = defineStore(
       const { dirs } = await getPathJump(id, stringPath.substring(name.length + 1))
       if (!dirs.isEmpty()) {
         // 读取目标路径文件夹
-        console.log('读取目标路径文件夹', dirs)
         // 重新实例化目录ID列表
         const dirList = dirs.map((rawDir) => new Dir(new Folder(rawDir)))
         children.value.length = 1

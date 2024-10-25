@@ -1,4 +1,4 @@
-import Folder from "@/models/File/Folder"
+import Folder from '@/models/File/Folder'
 
 // 标签类型
 type TagTheme = 'default' | 'success' | 'primary' | 'warning' | 'danger'
@@ -81,7 +81,9 @@ export enum FlagEnum {
   ASIDE = 'a', // 待上传
   SYSTEM = 's', // 系统与用户目录/文件的分割线
   MAIN = 'm', // 主目录
-  CLASSIFY = 'c' // 分类
+  CLASSIFY = 'c', // 分类
+  PHOTO_ALBUM = 'p', // 图库
+  DUSTBIN = 'd' // 回收站
 }
 
 export enum SortModeEnum {
@@ -90,43 +92,43 @@ export enum SortModeEnum {
 }
 
 export const modeOptions: Array<{
-  content: string,
-  size: string,
-  value: MoYunModeEnum,
-  prefixIcon: string,
+  content: string
+  size: string
+  value: MoYunModeEnum
+  prefixIcon: string
   divider?: boolean
 }> = [
-    {
-      content: '超大图标',
-      size: '20',
-      value: MoYunModeEnum.SUPER_BIG_ICON,
-      prefixIcon: `component-grid`
-    },
-    {
-      content: '大图标',
-      size: '16',
-      value: MoYunModeEnum.BIG_ICON,
-      prefixIcon: `component-grid`
-    },
-    {
-      content: '中图标',
-      size: '13',
-      value: MoYunModeEnum.MEDIUM_ICON,
-      prefixIcon: `component-grid`
-    },
-    {
-      content: '小图标',
-      size: '10',
-      value: MoYunModeEnum.SMALL_ICON,
-      prefixIcon: `component-grid`
-    },
-    {
-      content: '列表',
-      size: 'medium',
-      value: MoYunModeEnum.LIST,
-      prefixIcon: `list`
-    }
-  ]
+  {
+    content: '超大图标',
+    size: '20',
+    value: MoYunModeEnum.SUPER_BIG_ICON,
+    prefixIcon: `component-grid`
+  },
+  {
+    content: '大图标',
+    size: '16',
+    value: MoYunModeEnum.BIG_ICON,
+    prefixIcon: `component-grid`
+  },
+  {
+    content: '中图标',
+    size: '13',
+    value: MoYunModeEnum.MEDIUM_ICON,
+    prefixIcon: `component-grid`
+  },
+  {
+    content: '小图标',
+    size: '10',
+    value: MoYunModeEnum.SMALL_ICON,
+    prefixIcon: `component-grid`
+  },
+  {
+    content: '列表',
+    size: 'medium',
+    value: MoYunModeEnum.LIST,
+    prefixIcon: `list`
+  }
+]
 
 export const assembleOptions = [
   {

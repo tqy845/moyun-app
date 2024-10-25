@@ -1,8 +1,9 @@
-import { getFileList, sseSearchFolder } from '@/api/dir'
+import { getFileList, getPhotoList, sseSearchFolder } from '@/api/dir'
 import Folder from './Folder'
 import { FileRawModel } from '@/api/models/fileModel'
-import { useDirStore, useFileMapStore, usePathStore } from '@/stores'
+import { useDirStore, useFileMapStore, usePathStore, useSettingStore } from '@/stores'
 import { fileUtils } from '@/utils/functions'
+import { MoYunAssembleEnum } from '@/constants'
 
 export default class Dir {
   name: string
@@ -38,14 +39,19 @@ export default class Dir {
    */
   search = async (keyword: string) => {
     this.clear()
-    await sseSearchFolder(this.id, keyword, ({ files }) => files.forEach(file => this.appendFile(file)))
+    await sseSearchFolder(this.id, keyword, ({ files }) =>
+      files.forEach((file) => this.appendFile(file))
+    )
   }
 
   /**
    * 读取当前目录下的文件
    */
   readDir = async () => {
+    const { isDustbin, isPhotoAlbum } = useDirStore()
     const fileMapStore = useFileMapStore()
+    const { sort } = usePathStore()
+    const { photoAlbumParentId } = useSettingStore()
     const { isLoading, currentDirFiles, currentDirSelectedFiles } = storeToRefs(usePathStore())
     isLoading.value = true
 
@@ -53,11 +59,21 @@ export default class Dir {
     currentDirFiles.value.clear()
     currentDirSelectedFiles.value.clear()
 
-    const { sort } = usePathStore()
-    const { files } = await getFileList(this.id, {
+    const params = {
       page: 1,
-      size: 5
-    })
+      size: 5,
+      queryAllDeleted: isDustbin
+    }
+
+    /* 全部显示 */
+    let id = -1
+    if (photoAlbumParentId !== MoYunAssembleEnum.ALL) {
+      // 指定集合
+      id = photoAlbumParentId
+    }
+
+    const fn = isDustbin ? getFileList : getPhotoList
+    const { files } = await fn(isPhotoAlbum ? id : this.id, params)
     // 将源数据转换为实例
     const fileInstances = files.map(fileUtils.metadataConversionFileInstance)
     // 添加到渲染列表
@@ -69,7 +85,6 @@ export default class Dir {
     isLoading.value = false
     return
   }
-
 
   /**
    * 追加一个文件到本目录
@@ -103,7 +118,8 @@ export default class Dir {
   }
 
   clear = () => {
-    const { currentDirFiles, currentActionFiles, currentDirSelectedFiles } = storeToRefs(usePathStore())
+    const { currentDirFiles, currentActionFiles, currentDirSelectedFiles } =
+      storeToRefs(usePathStore())
     // 初始化
     currentDirFiles.value.clear()
     currentActionFiles.value.clear()
