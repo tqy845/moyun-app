@@ -48,7 +48,7 @@ export default class Dir {
    * 读取当前目录下的文件
    */
   readDir = async () => {
-    const { isDustbin, isPhotoAlbum } = useDirStore()
+    const { isDustbin, isPhotoAlbum, isBaseLayout } = useDirStore()
     const fileMapStore = useFileMapStore()
     const { sort } = usePathStore()
     const { photoAlbumParentId } = useSettingStore()
@@ -72,7 +72,7 @@ export default class Dir {
       id = photoAlbumParentId
     }
 
-    const fn = isDustbin ? getFileList : getPhotoList
+    const fn = isBaseLayout ? getFileList : getPhotoList
     const { files } = await fn(isPhotoAlbum ? id : this.id, params)
     // 将源数据转换为实例
     const fileInstances = files.map(fileUtils.metadataConversionFileInstance)
