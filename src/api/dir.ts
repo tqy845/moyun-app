@@ -2,9 +2,8 @@ import { request } from '@/utils/request'
 import { FileRawModel } from '@/api/models/fileModel'
 import { QueryDirectoryModel, AsideMenuModel, FolderCopyOptionModel } from '@/api/models/dirModel'
 import { FetchResponse } from '@/utils/request/utils'
-import { EventSourcePolyfill } from "event-source-polyfill";
-import { useUserStore } from '@/stores';
-
+import { EventSourcePolyfill } from 'event-source-polyfill'
+import { useUserStore } from '@/stores'
 
 const BASE_URL = import.meta.env.VITE_APP_BASE_API
 
@@ -23,7 +22,8 @@ const Api = {
   GetFileList: (folderId: number) => `/dir/${folderId}`,
   GetDirList: (folderId: number) => `/dir/${folderId}/list`,
   GetPhotoList: (folderId: number) => `/dir/photo/${folderId}/list`,
-  SearchFolder: (folderId: number, keyword: string) => `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`
+  SearchFolder: (folderId: number, keyword: string) =>
+    `${BASE_URL}/dir/${folderId}/search?keyword=${keyword}`
 }
 
 const EventSources = new WeakMap<any, EventSource>()
@@ -56,7 +56,11 @@ export const getDirList = (dirId: number, params: QueryDirectoryModel) => {
   })
 }
 
-export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, callback: (data: any) => void) => {
+export const sseCopyFolder = (
+  folderId: number,
+  options: FolderCopyOptionModel,
+  callback: (data: any) => void
+) => {
   // 注销上一个事件
   EventSources.get(callback)?.close()
   // 注册新事件
@@ -65,7 +69,7 @@ export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, 
     const querys = new URLSearchParams(options as unknown as Record<string, any>).toString()
     const connect = new EventSourcePolyfill(Api.CopyFolder(folderId).concat(`?${querys}`), {
       headers: {
-        'Authorization': `Bearer ${userStore.token}`
+        Authorization: `Bearer ${userStore.token}`
       }
     })
     // 缓存事件
@@ -73,7 +77,7 @@ export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, 
     connect.addEventListener(`start`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ progress: number }>
-      console.log("start成功", result.data);
+      console.log('start成功', result.data)
       callback?.({
         type: 'start',
         data: result.data!
@@ -82,7 +86,7 @@ export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, 
     connect.addEventListener(`progress`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ progress: number }>
-      console.log("progress成功", result.data);
+      console.log('progress成功', result.data)
       callback?.({
         type: 'progress',
         data: result.data!
@@ -104,26 +108,38 @@ export const sseCopyFolder = (folderId: number, options: FolderCopyOptionModel, 
 }
 
 export const postCutFolder = (folderId: number, targetDirId: number) => {
-  return request.post<FetchResponse<any>>(Api.CutFolder(folderId), {
-    body: {
-      targetDirId
+  return request.post<FetchResponse<any>>(
+    Api.CutFolder(folderId),
+    {
+      body: {
+        targetDirId
+      }
+    },
+    {
+      isTransformResponse: false
     }
-  }, {
-    isTransformResponse: false
-  })
+  )
 }
 
 export const putFixedQuickFolder = (folderId: number, isFixed: boolean = true) => {
-  return request.put<FetchResponse<{ flag: string }>>(Api.PutFixedQuickFolder(folderId), {
-    body: {
-      isFixed
+  return request.put<FetchResponse<{ flag: string }>>(
+    Api.PutFixedQuickFolder(folderId),
+    {
+      body: {
+        isFixed
+      }
+    },
+    {
+      isTransformResponse: false
     }
-  }, {
-    isTransformResponse: false
-  })
+  )
 }
 
-export const sseSearchFolder = (folderId: number, keyword: string, callback: (data: { files: Array<FileRawModel> }) => void) => {
+export const sseSearchFolder = (
+  folderId: number,
+  keyword: string,
+  callback: (data: { files: Array<FileRawModel> }) => void
+) => {
   // 注销上一个事件
   EventSources.get(callback)?.close()
   // 注册新事件
@@ -131,7 +147,7 @@ export const sseSearchFolder = (folderId: number, keyword: string, callback: (da
     const userStore = useUserStore()
     const connect = new EventSourcePolyfill(Api.SearchFolder(folderId, keyword), {
       headers: {
-        'Authorization': `Bearer ${userStore.token}`
+        Authorization: `Bearer ${userStore.token}`
       }
     })
     // 缓存事件
@@ -140,7 +156,7 @@ export const sseSearchFolder = (folderId: number, keyword: string, callback: (da
     connect.addEventListener(`content`, (event) => {
       const { data } = event as MessageEvent
       const result = JSON.parse(data) as FetchResponse<{ files: Array<FileRawModel> }>
-      console.log("成功", result);
+      console.log('成功', result)
       callback?.(result.data!)
     })
     // 完成
@@ -161,8 +177,9 @@ export const sseSearchFolder = (folderId: number, keyword: string, callback: (da
 }
 
 export const getPathJump = (folderId: number, path: string) => {
-  const querys = new URLSearchParams({ path }).toString()
-  return request.get(Api.GetPathJump(folderId).concat(`?${querys}`))
+  return request.get<{ dirs: Array<FileRawModel> }>(Api.GetPathJump(folderId), {
+    params: { path }
+  })
 }
 
 export function getById<T>(id: number) {
@@ -190,7 +207,11 @@ export function putRenameFolderName(folderId: number, body: { name: string }) {
 }
 
 export function putRemoveFolder(folderId: number) {
-  return request.put<FetchResponse<any>>(Api.RemoveFolder(folderId), {}, {
-    isTransformResponse: false
-  })
+  return request.put<FetchResponse<any>>(
+    Api.RemoveFolder(folderId),
+    {},
+    {
+      isTransformResponse: false
+    }
+  )
 }

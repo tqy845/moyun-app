@@ -15,7 +15,7 @@ import { useTemplateRef } from 'vue'
 const breadcrumbRef = useTemplateRef('breadcrumbRef')
 const breadcrumbContainerRef = ref()
 const systemStore = useSystemStore()
-const { back, forward } = usePathStore()
+const { back, forward, pathJump } = usePathStore()
 const { isBaseLayout } = storeToRefs(useDirStore())
 const { isLoading } = storeToRefs(usePathStore())
 
@@ -44,10 +44,6 @@ const handleObserver = ({ width }: { width: number }) => {
 
 const handleEditPath = (value: InputValue) => {
   pathString.value = value as string
-}
-
-const eventChangePathString = () => {
-  console.log('trigger。。。')
 }
 
 const handleChangeStringPath = (e: MouseEvent) => {
@@ -154,7 +150,7 @@ onUpdated(executed)
         style="all: unset; border: none"
         @blur="switchPathType('could')"
         @change="handleEditPath"
-        @enter="eventChangePathString"
+        @enter="pathJump"
       >
       </t-input>
 

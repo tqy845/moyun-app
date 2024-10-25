@@ -7,7 +7,7 @@ import { useDirStore, useFileMapStore, useFileStore, useSettingStore } from '@/s
 import Base from '@/models/File/Base.ts'
 import { cloneDeep } from 'lodash'
 import { postCopyFile, postCutFile } from '@/api/file'
-import { sseCopyFolder, postCutFolder } from '@/api/dir'
+import { sseCopyFolder, postCutFolder, getPathJump } from '@/api/dir'
 
 export type AggregateFile = (File & any) | (Folder & any)
 
@@ -21,7 +21,7 @@ export const usePathStore = defineStore(
     const currentDirFiles = ref<Array<AggregateFile>>([])
     const currentDirSelectedFiles = ref<Array<AggregateFile>>([])
     const currentActionFiles = ref<Array<AggregateFile>>([])
-    const { isBaseLayout } = storeToRefs(useDirStore())
+    const { isBaseLayout, asideMenuObjectCurrentIndexItem } = storeToRefs(useDirStore())
     const { readPhotoAlbum } = useDirStore()
     const { fileSortMode, fileSortType } = storeToRefs(useSettingStore())
     const keyword = ref('')
@@ -31,8 +31,9 @@ export const usePathStore = defineStore(
     const isSelected = (file: File | Folder) => {
       return currentDirSelectedFiles.value.includes(file)
     }
-    const clearSelected = () => {console.warn("123");
-    
+    const clearSelected = () => {
+      console.warn('123')
+
       currentDirSelectedFiles.value.length = 0
     }
     const addSelected = (...file: Array<File | Folder>) => {
@@ -87,6 +88,31 @@ export const usePathStore = defineStore(
       children.value.push(...peekDirList)
       // 清空历史路径
       peekDirArray.value.length = 0
+    }
+
+    const pathJump = async (stringPath: string) => {
+      const id = asideMenuObjectCurrentIndexItem.value.id
+      const name = asideMenuObjectCurrentIndexItem.value.name
+      const { dirs } = await getPathJump(id, stringPath.substring(name.length + 1))
+      if (!dirs.isEmpty()) {
+        // 读取目标路径文件夹
+        console.log('读取目标路径文件夹', dirs)
+        // 重新实例化目录ID列表
+        const dirList = dirs.map((rawDir) => new Dir(new Folder(rawDir)))
+        children.value.length = 1
+        children.value.push(...dirList)
+      } else {
+        const confirmDia = DialogPlugin({
+          header: '跳转失败',
+          theme: 'danger',
+          body: `找不到路径“${stringPath}”，请检查拼写并重试。`,
+          confirmBtn: '确定',
+          cancelBtn: null,
+          onConfirm: () => {
+            confirmDia.hide()
+          }
+        })
+      }
     }
 
     /**
@@ -156,7 +182,7 @@ export const usePathStore = defineStore(
               console.log('type = ', type)
               switch (type) {
                 case 'start':
-                  const { name , totalNumber} = data
+                  const { name, totalNumber } = data
                   newFile.name = name
                   copyOptionsRef.value.totalNumber = totalNumber
                   break
@@ -230,6 +256,7 @@ export const usePathStore = defineStore(
       reverseSelected,
       back,
       forward,
+      pathJump,
       sort,
       paste
     }

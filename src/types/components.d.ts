@@ -54,7 +54,6 @@ declare module 'vue' {
     TMenu: typeof import('tdesign-vue-next')['Menu']
     TMenuGroup: typeof import('tdesign-vue-next')['MenuGroup']
     TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
-    TMessage: typeof import('tdesign-vue-next')['Message']
     TNotification: typeof import('tdesign-vue-next')['Notification']
     TPopup: typeof import('tdesign-vue-next')['Popup']
     TProgress: typeof import('tdesign-vue-next')['Progress']

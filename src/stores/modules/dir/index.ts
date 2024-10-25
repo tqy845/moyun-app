@@ -1,12 +1,9 @@
 import { getAsideMenu, getPhotoList } from '@/api/dir'
 import Folder from '@/models/File/Folder'
-import File from '@/models/File/File'
 import { AsideMenuType } from './helper'
 import { FileExtensionEnum, FileLevelEnum, GroupEnum, MoYunAssembleEnum } from '@/constants'
 import { useFileMapStore, usePathStore, useSettingStore } from '@/stores'
 import { fileUtils } from '@/utils/functions'
-import { Prototype } from '@/models/File/interface'
-import { FileRawModel } from '@/api/models/fileModel'
 
 export const useDirStore = defineStore(
   `dirStore`,
@@ -85,8 +82,7 @@ export const useDirStore = defineStore(
     /**
      * 读取回收站
      */
-    const readDustbin = async () => {
-    }
+    const readDustbin = async () => {}
 
     const switchFolderSelect = (status: boolean) => {
       folderSelect.value = status
