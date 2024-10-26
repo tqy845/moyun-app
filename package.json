@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@actions/github": "^6.0.0",
     "@rushstack/eslint-patch": "^1.10.4",
     "@tauri-apps/api": "^2.0.3",
     "@tauri-apps/plugin-dialog": "^2.0.1",
