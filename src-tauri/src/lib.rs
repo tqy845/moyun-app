@@ -1,9 +1,8 @@
+use futures_util::StreamExt;
+use reqwest::header;
 use std::fs::OpenOptions;
 use std::io::{Seek, SeekFrom, Write};
-use futures_util::{StreamExt};
 use tauri::{AppHandle, Emitter};
-use reqwest::header;
-
 
 // 创建稀疏文件（不会立即占用全部磁盘空间）
 #[tauri::command]
@@ -68,16 +67,16 @@ async fn download(
         file.write_all(&chunk).map_err(|e| e.to_string())?;
 
         let progress = (downloaded as f64 / total_size as f64 * 100.0) as u32;
-        app.emit_to("download", "download-result", progress).map_err(|e| e.to_string())?;
+        app.emit_to("download", "download-result", progress)
+            .map_err(|e| e.to_string())?;
     }
 
     Ok(())
 }
 
-
-
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_upload::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_http::init())

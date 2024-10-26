@@ -2,8 +2,14 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "enables the default permissions",
-  "windows": ["main"],
-  "platforms": ["linux", "macOS", "windows"],
+  "windows": [
+    "main"
+  ],
+  "platforms": [
+    "linux",
+    "macOS",
+    "windows"
+  ],
   "permissions": [
     "core:event:default",
     "core:window:default",
@@ -48,7 +54,8 @@
         },
         {
           "url": "http://172.22.27.104:9000/*"
-        },    {
+        },
+        {
           "url": "http://192.168.5.127:9010/*"
         },
         {
@@ -64,6 +71,7 @@
         }
       ]
     },
-    "upload:default"
+    "upload:default",
+    "updater:default"
   ]
 }
