@@ -40,7 +40,7 @@ const handleSave = ()=>{
           <t-descriptions-item label="删除时间" v-if="fileRef?.deletedAt">
             {{ useDateFormat(fileRef?.deletedAt, 'YYYY-MM-DD HH:mm:ss') }}
           </t-descriptions-item>
-          <t-descriptions-item label="大小">{{ fileUtils.formatFileSize(fileRef.size || 0) }}</t-descriptions-item>
+          <t-descriptions-item label="大小">{{ fileUtils.formatFileSize(fileRef?.size || 0) }}</t-descriptions-item>
           <t-descriptions-item label="扩展名">{{ fileRef?.extension }}</t-descriptions-item>
         </t-descriptions>
       </t-tab-panel>
