@@ -10,7 +10,9 @@
     "tauri dev": "tauri dev",
     "tauri build": "tauri build",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "updater": "node scripts/updater.mjs",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "@actions/github": "^6.0.0",
@@ -35,6 +37,7 @@
     "event-source-polyfill": "^1.0.31",
     "js-sha256": "^0.11.0",
     "lodash": "^4.17.21",
+    "node-fetch": "^3.3.2",
     "nprogress": "^0.2.0",
     "pinia": "^2.2.4",
     "pinia-plugin-persistedstate": "^3.2.3",
