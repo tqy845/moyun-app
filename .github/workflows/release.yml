@@ -13,7 +13,7 @@ jobs:
       RELEASE_UPLOAD_ID: ${{ steps.create_release.outputs.id }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Query version number
         id: get_version
         shell: bash
@@ -23,7 +23,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: idev-coder/github-actions-release@v1
+        uses: idev-coder/github-actions-release@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
